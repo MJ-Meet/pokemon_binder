@@ -1,14 +1,41 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Login({ onLogin }) {
+    const [isLogin, setIsLogin] = useState(true);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (username.trim()) {
-            onLogin(username);
+        setError('');
+        if (!username.trim() || !password.trim()) {
+            setError('Please fill in all fields');
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const endpoint = isLogin ? '/api/login' : '/api/signup';
+            const res = await fetch(`http://localhost:5000${endpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                // Return token and username to App.jsx
+                onLogin(data.username, data.token);
+            } else {
+                setError(data.message || 'Authentication failed');
+            }
+        } catch (err) {
+            setError('An error occurred. Please try again later.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -54,9 +81,22 @@ export default function Login({ onLogin }) {
                         transition={{ delay: 0.4 }}
                         className="text-white/40 text-sm mt-2 font-medium"
                     >
-                        Access your digital collection
+                        {isLogin ? 'Access your digital collection' : 'Start your new collection'}
                     </motion.p>
                 </div>
+
+                <AnimatePresence>
+                    {error && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="bg-red-500/20 text-red-300 text-sm p-3 rounded-xl mb-4 text-center border border-red-500/30"
+                        >
+                            {error}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
                 <motion.form
                     initial={{ opacity: 0, y: 10 }}
@@ -84,18 +124,34 @@ export default function Login({ onLogin }) {
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="••••••••"
                             className="w-full bg-white-[0.03] border border-white/10 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-pokemon-blue focus:bg-white/5 transition-all text-white placeholder-white/20"
+                            required
                         />
                     </div>
 
                     <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
+                        disabled={isLoading}
                         type="submit"
-                        className="w-full bg-gradient-to-r from-pokemon-blue to-blue-500 text-white font-black uppercase tracking-[0.15em] py-4 rounded-2xl shadow-[0_0_20px_rgba(59,130,246,0.3)] mt-8 hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] transition-shadow text-sm"
+                        className="w-full bg-gradient-to-r from-pokemon-blue to-blue-500 text-white font-black uppercase tracking-[0.15em] py-4 rounded-2xl shadow-[0_0_20px_rgba(59,130,246,0.3)] mt-8 hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] transition-shadow text-sm disabled:opacity-50"
                     >
-                        Enter Binder
+                        {isLoading ? 'Processing...' : (isLogin ? 'Enter Binder' : 'Create Account')}
                     </motion.button>
                 </motion.form>
+
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.6 }}
+                    className="mt-6 text-center"
+                >
+                    <button
+                        onClick={() => { setIsLogin(!isLogin); setError(''); }}
+                        className="text-white/40 hover:text-white transition-colors text-xs font-bold uppercase tracking-wider"
+                    >
+                        {isLogin ? "New Trainer? Sign Up" : "Already a Trainer? Log In"}
+                    </button>
+                </motion.div>
             </motion.div>
         </div>
     );

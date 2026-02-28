@@ -6,8 +6,6 @@ import { BinderProvider } from './context/BinderContext'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BinderProvider>
-      <App />
-    </BinderProvider>
+    <App />
   </StrictMode>,
 )

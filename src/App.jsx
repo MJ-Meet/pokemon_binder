@@ -1,20 +1,18 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Book, Trash2, Search, Filter, Moon, Sun, Laptop, Menu, X } from 'lucide-react';
-import { useBinder } from './context/BinderContext';
+import { BinderProvider, useBinder } from './context/BinderContext';
 import BinderGrid from './components/BinderGrid';
 import CardModal from './components/CardModal';
 import BinderModal from './components/BinderModal';
 import Login from './components/Login';
 
-function App() {
+function AuthenticatedApp({ trainerName, onLogout }) {
   const {
     binders, currentBinder, currentBinderId, setCurrentBinderId,
     addBinder, deleteBinder, addCard, removeCard, stats
   } = useBinder();
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [trainerName, setTrainerName] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isCardModalOpen, setIsCardModalOpen] = useState(false);
   const [isBinderModalOpen, setIsBinderModalOpen] = useState(false);
@@ -61,15 +59,6 @@ function App() {
   const handleSaveCard = (slotNumber, cardData) => {
     addCard(currentBinderId, slotNumber, cardData);
   };
-
-  const handleLogin = (name) => {
-    setTrainerName(name);
-    setIsLoggedIn(true);
-  };
-
-  if (!isLoggedIn) {
-    return <Login onLogin={handleLogin} />;
-  }
 
   return (
     <div className="flex h-screen bg-binder-dark text-white overflow-hidden">
@@ -143,8 +132,15 @@ function App() {
                 </div>
                 <div className="truncate flex-1">
                   <p className="text-xs font-bold truncate">{trainerName || 'Trainer Account'}</p>
-                  <p className="text-[10px] text-white/40">Offline Mode</p>
+                  <p className="text-[10px] text-white/40">Online</p>
                 </div>
+                <button
+                  onClick={onLogout}
+                  className="p-2 hover:bg-white/10 rounded-lg text-white/50 hover:text-white transition-colors"
+                  title="Logout"
+                >
+                  <Moon size={16} />
+                </button>
               </div>
             </div>
           </motion.aside>
@@ -261,11 +257,38 @@ function App() {
         onClose={() => setIsBinderModalOpen(false)}
         onCreate={(name, total, grid) => {
           const id = addBinder(name, total, grid);
-          setCurrentBinderId(id);
+          if (id) setCurrentBinderId(id);
         }}
       />
     </div>
   );
 }
 
-export default App;
+export default function App() {
+  const [token, setToken] = useState(localStorage.getItem('binder_token'));
+  const [trainerName, setTrainerName] = useState(localStorage.getItem('binder_username'));
+
+  const handleLogin = (name, jwtToken) => {
+    localStorage.setItem('binder_token', jwtToken);
+    localStorage.setItem('binder_username', name);
+    setToken(jwtToken);
+    setTrainerName(name);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('binder_token');
+    localStorage.removeItem('binder_username');
+    setToken(null);
+    setTrainerName('');
+  };
+
+  if (!token) {
+    return <Login onLogin={handleLogin} />;
+  }
+
+  return (
+    <BinderProvider token={token}>
+      <AuthenticatedApp trainerName={trainerName} onLogout={handleLogout} />
+    </BinderProvider>
+  );
+}

@@ -8,7 +8,8 @@ const CardModal = ({ isOpen, onClose, onSave, initialData, slotNumber }) => {
         type: 'Grass',
         rarity: 'Common',
         notes: '',
-        image: null
+        image: null,
+        imageFile: null
     });
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef(null);
@@ -20,7 +21,7 @@ const CardModal = ({ isOpen, onClose, onSave, initialData, slotNumber }) => {
         if (initialData) {
             setFormData(initialData);
         } else {
-            setFormData({ name: '', type: 'Grass', rarity: 'Common', notes: '', image: null });
+            setFormData({ name: '', type: 'Grass', rarity: 'Common', notes: '', image: null, imageFile: null });
         }
     }, [initialData, isOpen]);
 
@@ -29,7 +30,7 @@ const CardModal = ({ isOpen, onClose, onSave, initialData, slotNumber }) => {
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setFormData(prev => ({ ...prev, image: reader.result }));
+                setFormData(prev => ({ ...prev, image: reader.result, imageFile: file }));
             };
             reader.readAsDataURL(file);
         }
@@ -42,7 +43,7 @@ const CardModal = ({ isOpen, onClose, onSave, initialData, slotNumber }) => {
         if (file && file.type.startsWith('image/')) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setFormData(prev => ({ ...prev, image: reader.result }));
+                setFormData(prev => ({ ...prev, image: reader.result, imageFile: file }));
             };
             reader.readAsDataURL(file);
         }
