@@ -20,7 +20,8 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=7)
 jwt = JWTManager(app)
 
 # MongoDB Connection
-MONGO_URI = 'mongodb+srv://meetextra00_db_user:Meet@cluster0.pr3jxow.mongodb.net/?appName=Cluster0'
+MONGO_URI = 'mongodb+srv://meetextra00_db_user:Meet_0701@cluster0.pr3jxow.mongodb.net/?appName=Cluster0'
+
 client = MongoClient(MONGO_URI)
 db = client['pokemon_binder_db']
 users_collection = db['users']
