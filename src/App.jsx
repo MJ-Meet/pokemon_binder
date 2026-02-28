@@ -5,6 +5,7 @@ import { useBinder } from './context/BinderContext';
 import BinderGrid from './components/BinderGrid';
 import CardModal from './components/CardModal';
 import BinderModal from './components/BinderModal';
+import Login from './components/Login';
 
 function App() {
   const {
@@ -12,6 +13,8 @@ function App() {
     addBinder, deleteBinder, addCard, removeCard, stats
   } = useBinder();
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [trainerName, setTrainerName] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isCardModalOpen, setIsCardModalOpen] = useState(false);
   const [isBinderModalOpen, setIsBinderModalOpen] = useState(false);
@@ -58,6 +61,15 @@ function App() {
   const handleSaveCard = (slotNumber, cardData) => {
     addCard(currentBinderId, slotNumber, cardData);
   };
+
+  const handleLogin = (name) => {
+    setTrainerName(name);
+    setIsLoggedIn(true);
+  };
+
+  if (!isLoggedIn) {
+    return <Login onLogin={handleLogin} />;
+  }
 
   return (
     <div className="flex h-screen bg-binder-dark text-white overflow-hidden">
@@ -127,10 +139,10 @@ function App() {
             <div className="p-4 border-t border-binder-border">
               <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5">
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pokemon-red to-pokemon-blue flex items-center justify-center font-black text-lg">
-                  P
+                  {trainerName ? trainerName[0].toUpperCase() : 'T'}
                 </div>
-                <div>
-                  <p className="text-xs font-bold">Trainer Account</p>
+                <div className="truncate flex-1">
+                  <p className="text-xs font-bold truncate">{trainerName || 'Trainer Account'}</p>
                   <p className="text-[10px] text-white/40">Offline Mode</p>
                 </div>
               </div>
