@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@theme {
+  --color-pokemon-red: #ff1c1c;
+  --color-pokemon-blue: #3b4cca;
+  --color-pokemon-yellow: #ffde00;
+  --color-binder-dark: #121212;
+  --color-binder-slot: #1e1e1e;
+  --color-binder-border: #333333;
+  --color-premium-gold: #d4af37;
+  
+  --font-pokemon: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+:root {
+  font-family: var(--font-pokemon);
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark light;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: var(--color-binder-dark);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  background: radial-gradient(circle at top right, #1a1a1a, #0d0d0d);
+}
+
+#root {
+  width: 100%;
+}
+
+@layer base {
+  * {
+    @apply border-binder-border;
+  }
+  body {
+    @apply bg-binder-dark text-white;
+  }
+}

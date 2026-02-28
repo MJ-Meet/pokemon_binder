@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PokéBinder - Premium Card Collection Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="dark-theme">
+    <div id="app">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <div class="pokeball-icon"></div>
+                    <h1 class="logo-text">POKEBINDER</h1>
+                </div>
+            </div>
+
+            <div class="sidebar-content">
+                <div class="sidebar-section">
+                    <div class="section-header">
+                        <span class="section-title">YOUR BINDERS</span>
+                        <button id="newBinderBtn" class="icon-btn" title="Create New Binder">
+                            <i data-lucide="plus"></i>
+                        </button>
+                    </div>
+                    <ul id="binderList" class="binder-list">
+                        <!-- Binders will be injected here -->
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="profile-card">
+                    <div class="profile-avatar">P</div>
+                    <div class="profile-info">
+                        <p class="profile-name">Trainer Account</p>
+                        <p class="profile-status">Flask Backend Active</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="main-content">
+            <header class="app-header">
+                <div class="header-left">
+                    <button id="toggleSidebar" class="icon-btn">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <div class="header-divider"></div>
+                    <div class="search-container">
+                        <i data-lucide="search" class="search-icon"></i>
+                        <input type="text" id="searchInput" placeholder="Search your collection...">
+                    </div>
+                    <div class="search-container slot-search">
+                        <i data-lucide="hash" class="search-icon"></i>
+                        <input type="number" id="slotSearchInput" placeholder="Go to slot...">
+                    </div>
+                </div>
+
+                <div id="binderStats" class="header-right hidden">
+                    <div class="stat-item">
+                        <span class="stat-label">TOTAL PROGRESS</span>
+                        <span id="completionPercent" class="stat-value">0% Complete</span>
+                    </div>
+                    <div class="header-divider"></div>
+                    <div class="stat-summary">
+                        <span id="filledCount">0</span>/<span id="totalCount">0</span> Slots
+                    </div>
+                </div>
+            </header>
+
+            <div id="content-area" class="content-area">
+                <div id="empty-state" class="empty-state">
+                    <div class="empty-icon">
+                        <i data-lucide="book" size="48"></i>
+                    </div>
+                    <h2>Ready to start collecting?</h2>
+                    <p>Create a digital binder to organize your physical Pokémon TCG collection. Customize slots, navigate pages, and track your progress.</p>
+                    <button class="primary-btn" onclick="openBinderModal()">Create My First Binder</button>
+                </div>
+
+                <div id="binder-view" class="binder-view hidden">
+                    <div class="binder-info-header">
+                        <h2 id="binderNameTitle" class="binder-title">Binder Name</h2>
+                        <div class="pagination-controls">
+                            <button id="prevPageBtn" class="page-btn"><i data-lucide="chevron-left"></i></button>
+                            <span id="pageIndicator" class="page-indicator">Page 1</span>
+                            <button id="nextPageBtn" class="page-btn"><i data-lucide="chevron-right"></i></button>
+                        </div>
+                    </div>
+                    <div id="slotGrid" class="slot-grid">
+                        <!-- Slots will be injected here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Modals -->
+        <div id="binderModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Create New Binder</h3>
+                    <button class="close-btn" onclick="closeModal('binderModal')"><i data-lucide="x"></i></button>
+                </div>
+                <form id="binderForm">
+                    <div class="form-group">
+                        <label for="binderName">Binder Name</label>
+                        <input type="text" id="binderName" placeholder="e.g. Base Set, Obsidian Flames" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="totalSlots">Total Slots</label>
+                        <select id="totalSlots">
+                            <option value="60">60 Slots (Standard)</option>
+                            <option value="120">120 Slots</option>
+                            <option value="240">240 Slots</option>
+                            <option value="1025">1025 Slots (National Dex)</option>
+                            <option value="custom">Custom Number</option>
+                        </select>
+                        <input type="number" id="customSlots" class="hidden" placeholder="Enter custom number">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="primary-btn">Create Binder</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="cardModal" class="modal">
+            <div class="modal-content large">
+                <div class="modal-header">
+                    <h3>Slot <span id="modalSlotNumber"></span></h3>
+                    <button class="close-btn" onclick="closeModal('cardModal')"><i data-lucide="x"></i></button>
+                </div>
+                <form id="cardForm">
+                    <div class="card-form-grid">
+                        <div class="preview-section">
+                            <div id="imageDropzone" class="dropzone">
+                                <div id="imagePreview" class="image-preview">
+                                    <i data-lucide="image" class="placeholder-icon"></i>
+                                    <p>Click or drag image to upload</p>
+                                </div>
+                                <input type="file" id="cardImage" accept="image/*" class="hidden">
+                            </div>
+                        </div>
+                        <div class="details-section">
+                            <div class="form-group">
+                                <label for="cardName">Pokémon Name</label>
+                                <input type="text" id="cardName" placeholder="e.g. Charizard" required>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group flex-1">
+                                    <label for="cardType">Type</label>
+                                    <select id="cardType">
+                                        <option value="Fire">Fire</option>
+                                        <option value="Water">Water</option>
+                                        <option value="Grass">Grass</option>
+                                        <option value="Electric">Electric</option>
+                                        <option value="Psychic">Psychic</option>
+                                        <option value="Fighting">Fighting</option>
+                                        <option value="Darkness">Darkness</option>
+                                        <option value="Metal">Metal</option>
+                                        <option value="Dragon">Dragon</option>
+                                        <option value="Colorless">Colorless</option>
+                                    </select>
+                                </div>
+                                <div class="form-group flex-1">
+                                    <label for="cardRarity">Rarity</label>
+                                    <input type="text" id="cardRarity" placeholder="e.g. Ultra Rare">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="cardNotes">Notes</label>
+                                <textarea id="cardNotes" rows="3" placeholder="Condition, value, or acquisition date..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="deleteCardBtn" class="danger-btn hidden">Remove Card</button>
+                        <button type="submit" class="primary-btn">Save Card</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
