@@ -1,7 +1,7 @@
 // Automatically switch API URL based on environment
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 // Change this URL to your deployed backend URL (e.g., Render, Railway)
-const PROD_API = 'https://your-backend-url.onrender.com';
+const PROD_API = 'https://pokemon-binder-pkbf.onrender.com';
 const API = isLocal ? 'http://localhost:8000' : PROD_API;
 const COLORS = ["#e63946","#3b4cca","#ffcb05","#2dc653","#9b5de5","#f77f00","#e040fb","#00b4d8"];
 const POKEMON_TYPES = [
