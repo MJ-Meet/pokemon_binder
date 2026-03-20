@@ -1,0 +1,12 @@
+[build]
+  # Tell Netlify to publish the frontend directory
+  publish = "frontend"
+  # No build command needed for vanilla JS
+  command = ""
+
+[[redirects]]
+  # Basic SPA routing (if ever needed)
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false

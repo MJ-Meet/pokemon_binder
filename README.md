@@ -99,5 +99,27 @@ pokemon_binder/
 └── migration_type.sql     # Adds Pokémon Type column
 ```
 
+---
+
+## 🌐 Deployment (Vercel & Netlify)
+
+Because this is a decoupled Full-Stack application, you can deploy the frontend securely and easily to Vercel or Netlify! The necessary configuration files (`vercel.json` and `netlify.toml`) are already included.
+
+### 1. Host the Backend First
+Vercel and Netlify are optimized for Frontend hosting. You should host your Python FastAPI backend and PostgreSQL database on a service like **Render**, **Railway**, or **Heroku**.
+* Once your backend is deployed, copy its live URL (e.g., `https://pokemon-binder-api.onrender.com`).
+
+### 2. Update the Frontend API URL
+In `frontend/app.js`, update line 4 replacing the placeholder with your live backend URL:
+```javascript
+const PROD_API = 'https://your-backend-url.onrender.com';
+```
+
+### 3. Deploy Frontend
+* **Vercel**: Simply import the GitHub repository into Vercel. The `vercel.json` file will automatically route all traffic to the `frontend/` directory.
+* **Netlify**: Simply import the GitHub repository into Netlify. The `netlify.toml` file automatically sets the publish directory to `frontend/`.
+
+---
+
 ## 📝 License
 This project is made for educational and organizational purposes. Pokémon and Pokémon Card Designs belong to Nintendo, Creatures, and Game Freak.
