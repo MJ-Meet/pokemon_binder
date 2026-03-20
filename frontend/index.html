@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PokéBinder — Premium Pokémon Card Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div id="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="logo">Poké<span>Binder</span></div>
+    </div>
+    <div class="sidebar-scroll">
+      <div class="section-label">MY COLLECTION</div>
+      <div id="binderList"></div>
+    </div>
+    <div class="sidebar-footer">
+      <button class="btn btn-gold" style="width:100%" onclick="openBinderModal()">
+        <svg fill="currentColor" width="16" height="16" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        New Binder
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Viewport -->
+  <main class="viewport">
+    <div class="content-area">
+      
+      <!-- Select State -->
+      <div id="binderEmptyState" class="empty-state">
+        <div class="empty-graphic">✨</div>
+        <h2 class="empty-title">POKÉBINDER</h2>
+        <p class="empty-desc">Your digital collection awaits. Select a binder from the sidebar or create a new one to start organizing.</p>
+        <button class="btn btn-gold" onclick="openBinderModal()">Create First Binder</button>
+      </div>
+
+      <!-- Active Binder View -->
+      <div id="binderMainView" class="hidden" style="display:contents">
+        
+        <!-- Header Section -->
+        <header id="headerSection" class="binder-header"></header>
+
+        <!-- Stats Section -->
+        <div id="statsSection" class="quick-stats"></div>
+
+        <!-- Controls Section -->
+        <div class="controls-bar">
+          <div class="search-input-group">
+            <svg class="search-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="searchInput" class="search-field" placeholder="Search by card name..." oninput="handleSearch(this.value)">
+          </div>
+          <div id="tagFilters" class="filter-tags"></div>
+        </div>
+
+        <!-- Pagination -->
+        <div id="paginationRows" class="pagination"></div>
+
+        <!-- Card Grid -->
+        <div id="cardContainer"></div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ─── Modals ────────────────────────────────────────────────── -->
+
+<!-- Binder Modal -->
+<div id="binderModalBackdrop" class="modal-backdrop" onclick="closeModals()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h2 id="binderModalTitle" class="modal-title">New Binder</h2>
+    
+    <div class="form-row">
+      <label class="form-label">Name</label>
+      <input type="text" id="bm_name" class="input-text" placeholder="e.g. Base Set 1999" maxlength="120">
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Pocket Layout</label>
+      <div class="gs-grid">
+        <div class="gs-btn active" id="gs2" onclick="selectGS(2)">
+          <div class="gs-mini" style="grid-template-columns: repeat(2, 1fr)"><div></div><div></div><div></div><div></div></div>
+          <span>4-Pocket</span>
+        </div>
+        <div class="gs-btn" id="gs3" onclick="selectGS(3)">
+          <div class="gs-mini" style="grid-template-columns: repeat(3, 1fr)"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+          <span>9-Pocket</span>
+        </div>
+        <div class="gs-btn" id="gs4" onclick="selectGS(4)">
+          <div class="gs-mini" style="grid-template-columns: repeat(4, 1fr)"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+          <span>16-Pocket</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Total Pages (1-50)</label>
+      <input type="number" id="bm_pages" class="input-text" value="10" min="1" max="50">
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Binder Theme</label>
+      <div class="color-grid" id="bm_colors">
+        <div class="color-box active" style="background:#e63946" data-val="#e63946"></div>
+        <div class="color-box" style="background:#3b4cca" data-val="#3b4cca"></div>
+        <div class="color-box" style="background:#ffcb05" data-val="#ffcb05"></div>
+        <div class="color-box" style="background:#2dc653" data-val="#2dc653"></div>
+        <div class="color-box" style="background:#9b5de5" data-val="#9b5de5"></div>
+        <div class="color-box" style="background:#f77f00" data-val="#f77f00"></div>
+        <div class="color-box" style="background:#e040fb" data-val="#e040fb"></div>
+        <div class="color-box" style="background:#333333" data-val="#333333"></div>
+      </div>
+    </div>
+
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="closeModals()">Cancel</button>
+      <button class="btn btn-gold" id="btnSaveBinder" onclick="saveBinder()">Create Binder</button>
+    </div>
+  </div>
+</div>
+
+<!-- Card Modal -->
+<div id="cardModalBackdrop" class="modal-backdrop" onclick="closeModals()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h2 class="modal-title">New Card</h2>
+
+    <div class="form-row">
+      <label class="form-label">Card Name</label>
+      <input type="text" id="cm_name" class="input-text" placeholder="e.g. Charizard Holo" maxlength="120">
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Pokémon Type <span style="color:var(--red)">*</span></label>
+      <div class="type-grid" id="cm_types">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Card Artwork</label>
+      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('cm_file').click()">
+        <input type="file" id="cm_file" style="display:none" accept="image/*" onchange="previewImg(this)">
+        <div id="up_empty" style="text-align:center">
+          <p style="font-size:2rem;margin-bottom:0.5rem">🖼️</p>
+          <p style="font-size:0.875rem;color:var(--text-dim)">Click or drag to upload image</p>
+        </div>
+        <img id="up_preview" class="hidden" style="max-height: 200px; border-radius: 8px; margin: 0 auto; display: block;">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Tags (Enter or Comma)</label>
+      <div class="tag-input-container" id="tagInputBox">
+        <input type="text" id="cm_tags" class="input-tag" placeholder="fire, holo, rare...">
+      </div>
+    </div>
+
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="closeModals()">Cancel</button>
+      <button class="btn btn-gold" id="btnSaveCard" onclick="saveCard()">Add to Collection</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- Application Logic -->
+<script src="app.js"></script>
+
+</body>
+</html>
