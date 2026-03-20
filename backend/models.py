@@ -20,7 +20,7 @@ class Binder(Base):
     __tablename__ = "binders"
     __table_args__ = (
         CheckConstraint("grid_size BETWEEN 2 AND 4", name="ck_binders_grid_size"),
-        CheckConstraint("pages BETWEEN 1 AND 50",    name="ck_binders_pages"),
+        CheckConstraint("pages BETWEEN 1 AND 200",    name="ck_binders_pages"),
     )
 
     id         = Column(Integer, primary_key=True, index=True)

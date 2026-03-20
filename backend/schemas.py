@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field, field_validator
 class BinderCreate(BaseModel):
     name:      str = Field(..., min_length=1, max_length=120)
     grid_size: int = Field(default=3, ge=2, le=4)
-    pages:     int = Field(default=10, ge=1, le=50)
+    pages:     int = Field(default=10, ge=1, le=200)
     color:     str = Field(default="#e63946", pattern=r"^#[0-9a-fA-F]{6}$")
 
     @field_validator("name")

@@ -50,6 +50,7 @@ CREATE DATABASE pokemon_binder;
 psql -U postgres -d pokemon_binder -f schema.sql
 psql -U postgres -d pokemon_binder -f migration.sql
 psql -U postgres -d pokemon_binder -f migration_type.sql
+psql -U postgres -d pokemon_binder -f migration_pages.sql
 ```
 *(If prompted for a password, enter your PostgreSQL password, default is usually `postgres`)*
 
@@ -96,7 +97,8 @@ pokemon_binder/
 │   └── app.js             # Logic, state, and API fetching
 ├── schema.sql             # Base database table creation
 ├── migration.sql          # Adds Tags feature tables
-└── migration_type.sql     # Adds Pokémon Type column
+├── migration_type.sql     # Adds Pokémon Type column
+└── migration_pages.sql    # Increases max pages to 200
 ```
 
 ---
