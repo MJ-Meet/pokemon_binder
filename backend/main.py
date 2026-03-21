@@ -317,6 +317,9 @@ def _hex_to_rgb(hex_color: str) -> tuple:
 
 @app.get("/binders/{binder_id}/export")
 def export_binder_pdf(binder_id: int, db: Session = Depends(get_db)):
+    def _safe(s):
+        return s.encode("latin-1", "replace").decode("latin-1") if s else ""
+
     binder = db.query(models.Binder).filter(models.Binder.id == binder_id).first()
     if not binder:
         raise HTTPException(status_code=404, detail="Binder not found")
@@ -364,7 +367,7 @@ def export_binder_pdf(binder_id: int, db: Session = Depends(get_db)):
         pdf.set_font("Helvetica", "B", 11)
         pdf.set_text_color(255, 255, 255)
         pdf.set_xy(MARGIN, 3)
-        pdf.cell(avail_w * 0.7, 8, binder.name[:60], align="L")
+        pdf.cell(avail_w * 0.7, 8, _safe(binder.name[:60]), align="L")
 
         # Page number (right)
         pdf.set_font("Helvetica", "", 9)
@@ -409,7 +412,7 @@ def export_binder_pdf(binder_id: int, db: Session = Depends(get_db)):
                     pdf.set_font("Helvetica", "B", 6)
                     pdf.set_text_color(255, 255, 255)
                     pdf.set_xy(x + 1, name_y + 1)
-                    pdf.cell(img_w - 2, label_h - 2, card.name[:28], align="C")
+                    pdf.cell(img_w - 2, label_h - 2, _safe(card.name[:28]), align="C")
 
                     # ── Tag pills ─────────────────────────────────────────
                     pill_y = name_y + label_h
@@ -425,7 +428,7 @@ def export_binder_pdf(binder_id: int, db: Session = Depends(get_db)):
                             pdf.set_font("Helvetica", "", 4.5)
                             pdf.set_text_color(20, 20, 20)
                             pdf.set_xy(px, pill_y + 0.5)
-                            pdf.cell(pill_slot_w - 0.5, pill_h - 1, tg.name[:10], align="C")
+                            pdf.cell(pill_slot_w - 0.5, pill_h - 1, _safe(tg.name[:10]), align="C")
 
                 else:
                     # ── Empty slot ────────────────────────────────────────
@@ -449,7 +452,7 @@ def export_binder_pdf(binder_id: int, db: Session = Depends(get_db)):
 
     # Build output
     pdf_bytes = bytes(pdf.output())
-    safe_name = binder.name.replace(" ", "_").replace("/", "-")
+    safe_name = _safe(binder.name).replace(" ", "_").replace("/", "-")
     return Response(
         content=pdf_bytes,
         media_type="application/pdf",

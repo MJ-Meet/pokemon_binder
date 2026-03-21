@@ -479,7 +479,9 @@ async function exportPDF(id) {
     const name = binders.find(b => b.id === id)?.name || 'binder';
     a.href     = url;
     a.download = name.replace(/\s+/g, '_') + '.pdf';
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
     notify('PDF downloaded! 📄');
   } catch (e) {
