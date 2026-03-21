@@ -255,7 +255,11 @@ body::before {
   background: var(--panel-solid); border: 1px solid var(--border-bright);
   width: min(520px, 95vw); border-radius: var(--radius-lg); padding: 2.5rem;
   box-shadow: 0 20px 60px rgba(0,0,0,0.6); transform: scale(0.95); transition: transform 0.3s;
+  max-height: 90vh;
+  overflow-y: auto;
 }
+.modal::-webkit-scrollbar { width: 6px; }
+.modal::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 6px; }
 .modal-backdrop.active .modal { transform: scale(1); }
 .modal-title { font-family: var(--font-logo); font-size: 2.5rem; margin-bottom: 1.5rem; color: var(--yellow); }
 
