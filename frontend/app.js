@@ -1,41 +1,50 @@
 // Automatically switch API URL based on environment
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-// Change this URL to your deployed backend URL (e.g., Render, Railway)
 const PROD_API = 'https://pokemon-binder-pkbf.onrender.com';
 const API = isLocal ? 'http://localhost:8000' : PROD_API;
 const COLORS = ["#e63946","#3b4cca","#ffcb05","#2dc653","#9b5de5","#f77f00","#e040fb","#00b4d8"];
 const POKEMON_TYPES = [
-  { name: 'Fire', color: '#f08030', icon: '🔥' },
-  { name: 'Water', color: '#6890f0', icon: '💧' },
-  { name: 'Grass', color: '#78c850', icon: '🌿' },
-  { name: 'Electric', color: '#f8d030', icon: '⚡' },
-  { name: 'Psychic', color: '#c461e8', icon: '👁️' },
-  { name: 'Fighting', color: '#c03028', icon: '🥊' },
-  { name: 'Dark', color: '#705848', icon: '🌑' },
-  { name: 'Steel', color: '#b8b8d0', icon: '⚙️' },
-  { name: 'Dragon', color: '#7038f8', icon: '🐲' },
+  { name: 'Fire',      color: '#f08030', icon: '🔥' },
+  { name: 'Water',     color: '#6890f0', icon: '💧' },
+  { name: 'Grass',     color: '#78c850', icon: '🌿' },
+  { name: 'Electric',  color: '#f8d030', icon: '⚡' },
+  { name: 'Psychic',   color: '#c461e8', icon: '👁️' },
+  { name: 'Fighting',  color: '#c03028', icon: '🥊' },
+  { name: 'Dark',      color: '#705848', icon: '🌑' },
+  { name: 'Steel',     color: '#b8b8d0', icon: '⚙️' },
+  { name: 'Dragon',    color: '#7038f8', icon: '🐲' },
   { name: 'Colorless', color: '#a8a878', icon: '⚪' }
 ];
 
-let binders = [];
-let curBinder = null;
-let curPage = 0;
-let curSlot = null;
-let editId = null;
-let curSearch = '';
-let curTag = null;
-let selectedGS = 3;
+let binders     = [];
+let curBinder   = null;
+let curPage     = 0;
+let curSlot     = null;
+let editId      = null;
+let curSearch   = '';
+let curTag      = null;
+let selectedGS  = 3;
 let pendingTags = [];
-let selectedType = null;
+let selectedType= null;
 
-// Init
+// ── Init ──────────────────────────────────────────────────────────────────────
 window.onload = () => {
+  pingBackend();    // FIX 1: wake up Render free-tier before any user action
   fetchBinders();
   initPickers();
   initTagInput();
   initDragDrop();
   renderTypeSelector();
 };
+
+// ── FIX 1: Ping backend on load so Render wakes up (~30s cold start) ─────────
+async function pingBackend() {
+  try {
+    await fetch(`${API}/`);
+  } catch {
+    // silently ignore — fetchBinders() will show the real error if truly down
+  }
+}
 
 function renderTypeSelector() {
   const container = document.getElementById('cm_types');
@@ -55,9 +64,20 @@ function selectCardType(typeName) {
   });
 }
 
+// ── FIX 2: Only open file dialog when no file is already selected ─────────────
 function initDragDrop() {
   const zone = document.getElementById('uploadZone');
   if (!zone) return;
+
+  // Click to open file picker — but ONLY if no file is selected yet
+  zone.addEventListener('click', e => {
+    // if user clicks the preview image or the remove button, don't re-open picker
+    if (e.target.id === 'up_preview') return;
+    const input = document.getElementById('cm_file');
+    // if a file is already loaded, clicking zone does nothing (prevents clearing)
+    if (input.files && input.files.length > 0) return;
+    input.click();
+  });
 
   zone.addEventListener('dragenter', e => { e.preventDefault(); zone.classList.add('drag-over'); });
   zone.addEventListener('dragover',  e => { e.preventDefault(); });
@@ -81,16 +101,17 @@ const notify = (msg, err = false) => {
   t.textContent = msg;
   t.style.background = err ? 'rgba(239, 68, 68, 0.9)' : 'rgba(24, 24, 31, 0.9)';
   t.classList.add('active');
-  setTimeout(() => t.classList.remove('active'), 3000);
+  setTimeout(() => t.classList.remove('active'), 3500);
 };
 
 async function fetchBinders() {
   try {
     const resp = await fetch(`${API}/binders`);
+    if (!resp.ok) throw new Error(`Server error ${resp.status}`);
     binders = await resp.json();
     renderSidebar();
     if (!curBinder && binders.length) selectBinder(binders[0].id);
-  } catch { notify('Server unavailable', true); }
+  } catch (e) { notify(`Server unavailable: ${e.message}`, true); }
 }
 
 function renderSidebar() {
@@ -113,23 +134,24 @@ function renderSidebar() {
 async function selectBinder(id) {
   try {
     const resp = await fetch(`${API}/binders/${id}`);
+    if (!resp.ok) throw new Error(`Server error ${resp.status}`);
     curBinder = await resp.json();
     curPage = 0;
     clearFilters();
     renderSidebar();
     renderView();
-  } catch { notify('Error loading binder', true); }
+  } catch (e) { notify(`Error loading binder: ${e.message}`, true); }
 }
 
 function renderView() {
-  const main = document.getElementById('binderMainView');
+  const main  = document.getElementById('binderMainView');
   const empty = document.getElementById('binderEmptyState');
   if (!curBinder) { main.classList.add('hidden'); empty.classList.remove('hidden'); return; }
-  
+
   main.classList.remove('hidden');
   empty.classList.add('hidden');
 
-  const b = curBinder;
+  const b           = curBinder;
   const isSearching = curSearch || curTag;
 
   // Header
@@ -147,11 +169,11 @@ function renderView() {
   `;
 
   // Stats
-  const total = b.pages * b.grid_size * b.grid_size;
-  const cards = b.cards.length;
+  const total    = b.pages * b.grid_size * b.grid_size;
+  const cards    = b.cards.length;
   const statTags = new Set();
   b.cards.forEach(c => c.tags?.forEach(t => statTags.add(t.name)));
-  
+
   document.getElementById('statsSection').innerHTML = `
     <div class="stat-card"><div class="stat-val">${cards}</div><div class="stat-lbl">Cards</div></div>
     <div class="stat-card"><div class="stat-val">${total - cards}</div><div class="stat-lbl">Empty Slots</div></div>
@@ -159,11 +181,11 @@ function renderView() {
     <div class="stat-card"><div class="stat-val">${statTags.size}</div><div class="stat-lbl">Unique Tags</div></div>
   `;
 
-  // Filter Chips
+  // Filter chips
   const filters = document.getElementById('tagFilters');
-  const tagMap = {};
+  const tagMap  = {};
   b.cards.forEach(c => c.tags?.forEach(t => tagMap[t.name] = t));
-  const sortedTags = Object.values(tagMap).sort((ax,bx) => ax.name.localeCompare(bx.name));
+  const sortedTags = Object.values(tagMap).sort((a, bx) => a.name.localeCompare(bx.name));
   filters.innerHTML = sortedTags.map(t => `
     <span class="tag-chip ${curTag === t.name ? 'active' : ''}" style="background:${t.color}" onclick="toggleTag('${t.name}')">
       ${esc(t.name)}
@@ -177,7 +199,7 @@ function renderView() {
     pag.classList.add('hidden');
   } else {
     pag.classList.remove('hidden');
-    pag.innerHTML = Array.from({length: b.pages}, (_,i) => {
+    pag.innerHTML = Array.from({length: b.pages}, (_, i) => {
       const has = b.cards.some(c => c.slot >= i*(b.grid_size**2) && c.slot < (i+1)*(b.grid_size**2));
       return `<button class="page-btn ${i === curPage ? 'active' : ''} ${has ? 'has-cards' : ''}" onclick="gotoPage(${i})">${i+1}</button>`;
     }).join('');
@@ -187,24 +209,27 @@ function renderView() {
   const grid = document.getElementById('cardContainer');
   grid.style.gridTemplateColumns = `repeat(${b.grid_size}, 1fr)`;
   grid.className = isSearching ? 'searching' : '';
-  
+
   let html = '';
   if (isSearching) {
     const filtered = b.cards.filter(c => {
       const nameMatch = c.name.toLowerCase().includes(curSearch.toLowerCase());
-      const tagMatch = !curTag || c.tags.some(t => t.name === curTag);
+      const tagMatch  = !curTag || c.tags.some(t => t.name === curTag);
       return nameMatch && tagMatch;
-    }).sort((ax,bx) => ax.slot - bx.slot);
-    
-    if (!filtered.length) { html = `<div style="grid-column:1/-1;text-align:center;padding:4rem;color:var(--text-dim);">No cards match your search criteria.</div>`; }
-    else { html = filtered.map(c => renderCard(c)).join(''); }
+    }).sort((a, bx) => a.slot - bx.slot);
+
+    if (!filtered.length) {
+      html = `<div style="grid-column:1/-1;text-align:center;padding:4rem;color:var(--text-dim);">No cards match your search criteria.</div>`;
+    } else {
+      html = filtered.map(c => renderCard(c)).join('');
+    }
   } else {
-    const gsq = b.grid_size**2;
+    const gsq   = b.grid_size**2;
     const start = curPage * gsq;
-    const end = start + gsq;
+    const end   = start + gsq;
     const cardMap = {};
     b.cards.forEach(c => cardMap[c.slot] = c);
-    for (let s=start; s<end; s++) {
+    for (let s = start; s < end; s++) {
       const c = cardMap[s];
       html += c ? renderCard(c) : `
         <div class="card-slot card-empty" onclick="openCardModal(${s})">
@@ -217,14 +242,14 @@ function renderView() {
 }
 
 function renderCard(c) {
-  const typeDef = POKEMON_TYPES.find(t => t.name === c.card_type) || POKEMON_TYPES[9];
+  const typeDef  = POKEMON_TYPES.find(t => t.name === c.card_type) || POKEMON_TYPES[9];
   const tagsHtml = (c.tags || []).slice(0, 3).map(t => `<span class="mini-tag" style="background:${t.color}">${esc(t.name)}</span>`).join('');
   const fullTags = (c.tags || []).map(t => `<span class="tag-chip" style="background:${t.color}">${esc(t.name)}</span>`).join('');
   return `
     <div class="card-slot card-filled">
       <img src="${API}/cards/${c.id}/image" class="card-img" loading="lazy">
       <div class="card-tags">
-        <span class="mini-tag" style="background:${typeDef.color}; color:#fff; display:flex; align-items:center; gap:4px">
+        <span class="mini-tag" style="background:${typeDef.color};color:#fff;display:flex;align-items:center;gap:4px">
           <span>${typeDef.icon}</span> ${esc(typeDef.name)}
         </span>
         ${tagsHtml}
@@ -240,17 +265,17 @@ function renderCard(c) {
 }
 
 // Actions
-function gotoPage(p) { curPage = p; renderView(); }
-function handleSearch(v) { curSearch = v; renderView(); }
-function toggleTag(t) { curTag = (curTag === t) ? null : t; renderView(); }
-function clearFilters() { curSearch = ''; curTag = null; document.getElementById('searchInput').value = ''; renderView(); }
+function gotoPage(p)      { curPage = p; renderView(); }
+function handleSearch(v)  { curSearch = v; renderView(); }
+function toggleTag(t)     { curTag = (curTag === t) ? null : t; renderView(); }
+function clearFilters()   { curSearch = ''; curTag = null; document.getElementById('searchInput').value = ''; renderView(); }
 
 // Modals
 function openBinderModal(id = null) {
   editId = id;
   document.getElementById('binderModalTitle').textContent = id ? 'Edit Binder' : 'New Binder';
   const b = binders.find(x => x.id === id);
-  document.getElementById('bm_name').value = b?.name || '';
+  document.getElementById('bm_name').value  = b?.name  || '';
   document.getElementById('bm_pages').value = b?.pages || 10;
   selectGS(b?.grid_size || 3);
   selectColorVal(b?.color || '#e63946');
@@ -258,15 +283,29 @@ function openBinderModal(id = null) {
   document.getElementById('binderModalBackdrop').classList.add('active');
 }
 
+// FIX 2: Reset file input state properly when opening card modal
 function openCardModal(slot) {
-  curSlot = slot;
-  pendingTags = [];
+  curSlot      = slot;
+  pendingTags  = [];
   selectedType = null;
   document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('cm_name').value = '';
-  document.getElementById('cm_file').value = '';
+
+  // Properly clear file input
+  const fileInput = document.getElementById('cm_file');
+  fileInput.value = '';
+  // Clear DataTransfer to ensure files list is truly empty in all browsers
+  try { fileInput.files = new DataTransfer().files; } catch(e) {}
+
   document.getElementById('up_preview').classList.add('hidden');
+  document.getElementById('up_preview').src = '';
   document.getElementById('up_empty').classList.remove('hidden');
+
+  // Clear any existing tag pills
+  const tagBox = document.getElementById('tagInputBox');
+  tagBox.querySelectorAll('.pill').forEach(p => p.remove());
+  document.getElementById('cm_tags').value = '';
+
   document.getElementById('cardModalBackdrop').classList.add('active');
 }
 
@@ -314,78 +353,135 @@ function previewImg(input) {
   if (input.files && input.files[0]) {
     const reader = new FileReader();
     reader.onload = e => {
-      document.getElementById('up_preview').src = e.target.result;
-      document.getElementById('up_preview').classList.remove('hidden');
+      const preview = document.getElementById('up_preview');
+      preview.src = e.target.result;
+      preview.classList.remove('hidden');
       document.getElementById('up_empty').classList.add('hidden');
     };
     reader.readAsDataURL(input.files[0]);
   }
 }
 
+// FIX 3: Check resp.ok + show actual server error in saveBinder ───────────────
 async function saveBinder() {
   const name = document.getElementById('bm_name').value.trim();
   if (!name) return notify('Name is required', true);
-  const pages = parseInt(document.getElementById('bm_pages').value);
-  const color = document.querySelector('.color-box.active').dataset.val;
-  const body = { name, pages, grid_size: selectedGS, color };
-  
-  document.getElementById('btnSaveBinder').disabled = true;
+
+  const pages     = parseInt(document.getElementById('bm_pages').value);
+  const colorEl   = document.querySelector('.color-box.active');
+  if (!colorEl) return notify('Please select a color', true);
+  const color     = colorEl.dataset.val;
+  const body      = { name, pages, grid_size: selectedGS, color };
+
+  const btn = document.getElementById('btnSaveBinder');
+  btn.disabled    = true;
+  btn.textContent = 'Saving…';
+
   try {
     const method = editId ? 'PUT' : 'POST';
-    const url = editId ? `${API}/binders/${editId}` : `${API}/binders`;
-    const resp = await fetch(url, {
-      method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(body)
+    const url    = editId ? `${API}/binders/${editId}` : `${API}/binders`;
+    const resp   = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
     });
+
+    // FIX 3: check resp.ok — if server returned 4xx/5xx, read the error detail
+    if (!resp.ok) {
+      const errData = await resp.json().catch(() => ({}));
+      throw new Error(errData.detail || `Server error ${resp.status}`);
+    }
+
     const data = await resp.json();
     closeModals();
-    notify('Success!');
+    notify('Binder saved! 🎉');
     await fetchBinders();
     selectBinder(data.id);
-  } catch { notify('Error saving binder', true); }
-  finally { document.getElementById('btnSaveBinder').disabled = false; }
+  } catch (e) {
+    notify(`Error: ${e.message}`, true);
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = editId ? 'Update Binder' : 'Create Binder';
+  }
 }
 
+// FIX 2+3: Separate validation messages + check resp.ok in saveCard ───────────
 async function saveCard() {
   const name = document.getElementById('cm_name').value.trim();
   const file = document.getElementById('cm_file').files[0];
-  if (!name || !file) return notify('Name and Image are required', true);
+
+  // FIX 2: Separate error messages so user knows exactly what's missing
+  if (!name) return notify('Please enter a card name', true);
+  if (!file)  return notify('Please select a card image', true);
   if (!selectedType) return notify('Please select a Pokémon Type', true);
 
   const fd = new FormData();
-  fd.append('name', name);
-  fd.append('slot', curSlot);
+  fd.append('name',      name);
+  fd.append('slot',      curSlot);
   fd.append('card_type', selectedType);
-  fd.append('file', file);
-  fd.append('tags', pendingTags.join(','));
+  fd.append('file',      file);
+  fd.append('tags',      pendingTags.join(','));
 
-  document.getElementById('btnSaveCard').disabled = true;
+  const btn       = document.getElementById('btnSaveCard');
+  btn.disabled    = true;
+  btn.textContent = 'Uploading…';
+
   try {
-    const resp = await fetch(`${API}/binders/${curBinder.id}/cards`, { method:'POST', body:fd });
-    if (resp.ok) {
-      closeModals();
-      notify('Card added!');
-      selectBinder(curBinder.id);
-    } else { notify('Upload failed', true); }
-  } catch { notify('Error', true); }
-  finally { document.getElementById('btnSaveCard').disabled = false; }
+    const resp = await fetch(`${API}/binders/${curBinder.id}/cards`, { method: 'POST', body: fd });
+
+    // FIX 3: read actual server error detail
+    if (!resp.ok) {
+      const errData = await resp.json().catch(() => ({}));
+      throw new Error(errData.detail || `Server error ${resp.status}`);
+    }
+
+    closeModals();
+    notify('Card added! ✨');
+    selectBinder(curBinder.id);
+  } catch (e) {
+    notify(`Upload failed: ${e.message}`, true);
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = 'Add to Collection';
+  }
 }
 
 async function deleteBinder(id) {
   if (!confirm('Permanently delete this binder?')) return;
-  await fetch(`${API}/binders/${id}`, { method: 'DELETE' });
-  curBinder = null;
-  fetchBinders();
+  try {
+    await fetch(`${API}/binders/${id}`, { method: 'DELETE' });
+    curBinder = null;
+    notify('Binder deleted');
+    fetchBinders();
+  } catch { notify('Failed to delete binder', true); }
 }
 
 async function deleteCard(id) {
   if (!confirm('Remove card?')) return;
-  await fetch(`${API}/cards/${id}`, { method: 'DELETE' });
-  selectBinder(curBinder.id);
+  try {
+    await fetch(`${API}/cards/${id}`, { method: 'DELETE' });
+    notify('Card removed');
+    selectBinder(curBinder.id);
+  } catch { notify('Failed to remove card', true); }
 }
 
 async function exportPDF(id) {
-  window.location.href = `${API}/binders/${id}/export`;
-  notify('PDF Download Started');
+  try {
+    notify('Generating PDF…');
+    const resp = await fetch(`${API}/binders/${id}/export`);
+    if (!resp.ok) throw new Error(`Server error ${resp.status}`);
+    const blob = await resp.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    const name = binders.find(b => b.id === id)?.name || 'binder';
+    a.href     = url;
+    a.download = name.replace(/\s+/g, '_') + '.pdf';
+    a.click();
+    URL.revokeObjectURL(url);
+    notify('PDF downloaded! 📄');
+  } catch (e) {
+    notify(`Export failed: ${e.message}`, true);
+  }
 }
 
 function esc(s) {
