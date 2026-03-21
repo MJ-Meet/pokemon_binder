@@ -135,9 +135,12 @@ async function selectBinder(id) {
   try {
     const resp = await fetch(`${API}/binders/${id}`);
     if (!resp.ok) throw new Error(`Server error ${resp.status}`);
+    const isSameBinder = curBinder && curBinder.id === id;
     curBinder = await resp.json();
-    curPage = 0;
-    clearFilters();
+    if (!isSameBinder) {
+      curPage = 0;
+      clearFilters();
+    }
     renderSidebar();
     renderView();
   } catch (e) { notify(`Error loading binder: ${e.message}`, true); }
