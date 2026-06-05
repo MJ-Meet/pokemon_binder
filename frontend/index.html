@@ -4,19 +4,38 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PokéBinder — Premium Pokémon Card Manager</title>
+  <meta name="description" content="Organize, track, and showcase your Pokémon card collection with PokéBinder — the premium digital binder experience." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
 <div id="app">
-  <!-- Sidebar -->
+  <!-- ─── Sidebar ─────────────────────────────────────────────────────────── -->
   <aside class="sidebar">
     <div class="sidebar-brand">
       <div class="logo">Poké<span>Binder</span></div>
     </div>
+
+    <!-- Nav Links -->
+    <nav class="sidebar-nav">
+      <button class="nav-link" id="navBinder" onclick="navigateTo('binder')">
+        <span class="nav-icon">📦</span> My Binders
+      </button>
+      <button class="nav-link" id="navDashboard" onclick="navigateTo('dashboard')">
+        <span class="nav-icon">📊</span> Dashboard
+      </button>
+      <button class="nav-link" id="navFavorites" onclick="navigateTo('favorites')">
+        <span class="nav-icon">❤️</span> Favorites
+      </button>
+      <button class="nav-link" id="navSets" onclick="navigateTo('sets')">
+        <span class="nav-icon">🏅</span> Set Progress
+      </button>
+    </nav>
+
     <div class="sidebar-scroll">
       <div class="section-label">MY COLLECTION</div>
       <div id="binderList"></div>
@@ -29,54 +48,195 @@
     </div>
   </aside>
 
-  <!-- Main Viewport -->
+  <!-- ─── Main Viewport ───────────────────────────────────────────────────── -->
   <main class="viewport">
     <div class="content-area">
-      
-      <!-- Select State -->
-      <div id="binderEmptyState" class="empty-state">
-        <div class="empty-graphic">✨</div>
-        <h2 class="empty-title">POKÉBINDER</h2>
-        <p class="empty-desc">Your digital collection awaits. Select a binder from the sidebar or create a new one to start organizing.</p>
-        <button class="btn btn-gold" onclick="openBinderModal()">Create First Binder</button>
-      </div>
 
-      <!-- Active Binder View -->
-      <div id="binderMainView" class="hidden" style="display:contents">
-        
-        <!-- Header Section -->
-        <header id="headerSection" class="binder-header"></header>
-
-        <!-- Stats Section -->
-        <div id="statsSection" class="quick-stats"></div>
-
-        <!-- Controls Section -->
-        <div class="controls-bar">
-          <div class="search-input-group">
-            <svg class="search-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" id="searchInput" class="search-field" placeholder="Search by card name..." oninput="handleSearch(this.value)">
-          </div>
-          <div id="tagFilters" class="filter-tags"></div>
+      <!-- ═══ BINDER PAGE ════════════════════════════════════════════════════ -->
+      <div id="binderPage">
+        <!-- Select State -->
+        <div id="binderEmptyState" class="empty-state">
+          <div class="empty-graphic">✨</div>
+          <h2 class="empty-title">POKÉBINDER</h2>
+          <p class="empty-desc">Your digital collection awaits. Select a binder from the sidebar or create a new one to start organizing.</p>
+          <button class="btn btn-gold" onclick="openBinderModal()">Create First Binder</button>
         </div>
 
-        <!-- Pagination -->
-        <div id="paginationRows" class="pagination"></div>
+        <!-- Active Binder View -->
+        <div id="binderMainView" class="hidden" style="display:contents">
+          <header id="headerSection" class="binder-header"></header>
+          <div id="statsSection" class="quick-stats"></div>
 
-        <!-- Card Grid -->
-        <div id="cardContainer"></div>
+          <!-- Controls -->
+          <div class="controls-bar">
+            <div class="controls-top-row">
+              <div class="search-input-group">
+                <svg class="search-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="searchInput" class="search-field" placeholder="Search by card name..." oninput="handleSearch(this.value)">
+              </div>
+              <button class="btn btn-outline btn-sm filter-toggle-btn" onclick="toggleFilterPanel()" id="filterToggleBtn">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h18M7 8h10M11 12h2"/></svg>
+                Filters
+              </button>
+            </div>
 
+            <!-- Advanced Filter Panel -->
+            <div id="filterPanel" class="filter-panel hidden">
+              <div class="filter-section">
+                <div class="filter-section-label">Pokémon Type</div>
+                <div class="filter-type-grid" id="filterTypeGrid"></div>
+              </div>
+              <div class="filter-section">
+                <div class="filter-section-label">Rarity</div>
+                <div class="filter-rarity-grid" id="filterRarityGrid"></div>
+              </div>
+              <div class="filter-section">
+                <div class="filter-section-label">Set Name</div>
+                <input type="text" id="filterSetInput" class="input-text input-sm" placeholder="Filter by set..." oninput="applyAdvancedFilter('set_name', this.value)">
+              </div>
+              <div class="filter-row-actions">
+                <label class="filter-checkbox-label">
+                  <input type="checkbox" id="filterFavOnly" onchange="applyAdvancedFilter('fav_only', this.checked)"> Favorites Only
+                </label>
+                <label class="filter-checkbox-label">
+                  <input type="checkbox" id="filterRecentOnly" onchange="applyAdvancedFilter('recent', this.checked)"> Recently Added (7d)
+                </label>
+                <button class="btn btn-outline btn-sm" onclick="clearAdvancedFilters()">Clear All ✕</button>
+              </div>
+            </div>
+
+            <!-- Active filter chips -->
+            <div id="activeFilterChips" class="active-filter-chips"></div>
+          </div>
+
+          <div id="paginationRows" class="pagination"></div>
+          <div id="cardContainer"></div>
+        </div>
       </div>
-    </div>
+
+      <!-- ═══ DASHBOARD PAGE ═════════════════════════════════════════════════ -->
+      <div id="dashboardPage" class="page hidden">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">📊 Collection Dashboard</h1>
+            <p class="page-subtitle">Your collection at a glance</p>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="loadDashboard()">↻ Refresh</button>
+        </div>
+
+        <div class="dash-stats-grid" id="dashStatsGrid">
+          <!-- Stat cards rendered by JS -->
+        </div>
+
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3 class="chart-title">🔥 Cards by Type</h3>
+            <div class="chart-wrapper"><canvas id="typeChart"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <h3 class="chart-title">⭐ Cards by Rarity</h3>
+            <div class="chart-wrapper"><canvas id="rarityChart"></canvas></div>
+          </div>
+        </div>
+
+        <div class="chart-card chart-full">
+          <h3 class="chart-title">📈 Collection Growth Over Time</h3>
+          <div class="chart-wrapper chart-wrapper-tall"><canvas id="growthChart"></canvas></div>
+        </div>
+
+        <div class="dash-bottom-grid">
+          <div class="panel-card">
+            <h3 class="panel-title">🕐 Recently Added</h3>
+            <div id="recentCardsList" class="recent-cards-list"></div>
+          </div>
+          <div class="panel-card">
+            <h3 class="panel-title">✨ Highlights</h3>
+            <div id="dashHighlights" class="highlights-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ FAVORITES PAGE ════════════════════════════════════════════════ -->
+      <div id="favoritesPage" class="page hidden">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">❤️ Favorites</h1>
+            <p class="page-subtitle" id="favSubtitle">Your most loved cards</p>
+          </div>
+          <div class="page-header-actions">
+            <div class="view-toggle">
+              <button class="view-btn active" id="viewGrid" onclick="setFavView('grid')" title="Grid view">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg>
+              </button>
+              <button class="view-btn" id="viewList" onclick="setFavView('list')" title="List view">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+              </button>
+            </div>
+            <select class="input-text input-sm" id="favSort" onchange="setFavSort(this.value)">
+              <option value="date_desc">Newest First</option>
+              <option value="date_asc">Oldest First</option>
+              <option value="name_asc">Name A–Z</option>
+              <option value="rarity">By Rarity</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Highlights strip -->
+        <div id="favHighlights" class="fav-highlights"></div>
+
+        <div id="favGrid" class="fav-grid"></div>
+        <div id="favEmpty" class="empty-state hidden">
+          <div class="empty-graphic">🤍</div>
+          <h2 class="empty-title">No Favorites Yet</h2>
+          <p class="empty-desc">Open any card and tap the heart to add it to your favorites.</p>
+        </div>
+      </div>
+
+      <!-- ═══ SETS PAGE ══════════════════════════════════════════════════════ -->
+      <div id="setsPage" class="page hidden">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">🏅 Set Progress</h1>
+            <p class="page-subtitle">Track your completion across every set</p>
+          </div>
+        </div>
+
+        <div class="sets-controls">
+          <div class="search-input-group" style="flex:1">
+            <svg class="search-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="setSearchInput" class="search-field" placeholder="Search sets..." oninput="filterSets(this.value)">
+          </div>
+          <select class="input-text input-sm" id="setSort" onchange="sortSetsBy(this.value)">
+            <option value="pct_desc">Completion ↓</option>
+            <option value="pct_asc">Completion ↑</option>
+            <option value="name_asc">Name A–Z</option>
+            <option value="collected_desc">Most Cards</option>
+          </select>
+          <div class="sets-filter-btns">
+            <button class="btn btn-outline btn-sm" onclick="filterSetsByStatus('all')" id="setFilterAll">All</button>
+            <button class="btn btn-outline btn-sm" onclick="filterSetsByStatus('complete')" id="setFilterComplete">Completed ✓</button>
+            <button class="btn btn-outline btn-sm" onclick="filterSetsByStatus('incomplete')" id="setFilterIncomplete">In Progress</button>
+            <button class="btn btn-gold btn-sm" onclick="openAddSetModal()">+ Add Set</button>
+          </div>
+        </div>
+
+        <div id="setsGrid" class="sets-grid"></div>
+        <div id="setsEmpty" class="empty-state hidden">
+          <div class="empty-graphic">🏅</div>
+          <h2 class="empty-title">No Sets Tracked</h2>
+          <p class="empty-desc">When adding cards, fill in the Set Name and Set Total Cards fields to start tracking progress.</p>
+        </div>
+      </div>
+
+    </div><!-- .content-area -->
   </main>
 </div>
 
-<!-- ─── Modals ────────────────────────────────────────────────── -->
-
-<!-- Binder Modal -->
+<!-- ─── Binder Modal ─────────────────────────────────────────────────────── -->
 <div id="binderModalBackdrop" class="modal-backdrop" onclick="closeModals()">
   <div class="modal" onclick="event.stopPropagation()">
     <h2 id="binderModalTitle" class="modal-title">New Binder</h2>
-    
+
     <div class="form-row">
       <label class="form-label">Name</label>
       <input type="text" id="bm_name" class="input-text" placeholder="e.g. Base Set 1999" maxlength="120">
@@ -126,7 +286,29 @@
   </div>
 </div>
 
-<!-- Card Modal -->
+<!-- ─── Add Set Modal ────────────────────────────────────────────────────── -->
+<div id="addSetModal" class="modal-backdrop" onclick="closeAddSetModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h2 class="modal-title">New Set</h2>
+
+    <div class="form-row">
+      <label class="form-label">Set Name</label>
+      <input type="text" id="set_add_name" class="input-text" placeholder="e.g. Base Set" maxlength="120">
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Total Cards in Set</label>
+      <input type="number" id="set_add_total_cards" class="input-text" placeholder="e.g. 102" min="1">
+    </div>
+
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="closeAddSetModal()">Cancel</button>
+      <button class="btn btn-gold" onclick="saveNewSet()">Save Set</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Card Upload Modal ────────────────────────────────────────────────── -->
 <div id="cardModalBackdrop" class="modal-backdrop" onclick="closeModals()">
   <div class="modal" onclick="event.stopPropagation()">
     <h2 class="modal-title">New Card</h2>
@@ -138,27 +320,53 @@
 
     <div class="form-row">
       <label class="form-label">Pokémon Type <span style="color:var(--red)">*</span></label>
-      <div class="type-grid" id="cm_types">
-        <!-- populated by JS -->
-      </div>
+      <div class="type-grid" id="cm_types"></div>
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Rarity</label>
+      <select id="cm_rarity" class="input-text">
+        <option value="">— Select Rarity —</option>
+        <option>Common</option>
+        <option>Uncommon</option>
+        <option>Rare</option>
+        <option>Super Rare</option>
+        <option>Baby Shiny</option>
+        <option>Rare Shiny</option>
+        <option>Ilusration Rare(IR)</option>
+        <option>Special Art Rare (SAR)</option>
+        <option>Special Ilustration Art Rare</option>
+        <option>Gold</option>
+      </select>
     </div>
 
     <div class="form-row">
       <label class="form-label">Card Artwork</label>
-      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('cm_file').click()">
+      <div class="upload-zone" id="uploadZone">
         <input type="file" id="cm_file" style="display:none" accept="image/*" onchange="previewImg(this)">
         <div id="up_empty" style="text-align:center">
           <p style="font-size:2rem;margin-bottom:0.5rem">🖼️</p>
           <p style="font-size:0.875rem;color:var(--text-dim)">Click or drag to upload image</p>
         </div>
-        <img id="up_preview" class="hidden" style="max-height: 200px; border-radius: 8px; margin: 0 auto; display: block;">
+        <img id="up_preview" class="hidden" style="max-height:200px;border-radius:8px;margin:0 auto;display:block;" alt="Preview">
       </div>
     </div>
 
     <div class="form-row">
-      <label class="form-label">Tags (Enter or Comma)</label>
-      <div class="tag-input-container" id="tagInputBox">
-        <input type="text" id="cm_tags" class="input-tag" placeholder="fire, holo, rare...">
+      <label class="form-label">Set Name</label>
+      <select id="cm_set_name" class="input-text" onchange="onSetSelectionChange('cm_set_name', 'cm_set_total')">
+        <option value="">— None —</option>
+      </select>
+    </div>
+
+    <div class="form-two-col">
+      <div class="form-row">
+        <label class="form-label">Card Number</label>
+        <input type="number" id="cm_card_number" class="input-text" placeholder="e.g. 1" min="1">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Set Total Cards</label>
+        <input type="number" id="cm_set_total" class="input-text" placeholder="e.g. 165" min="1" readonly>
       </div>
     </div>
 
@@ -169,10 +377,122 @@
   </div>
 </div>
 
+<!-- ─── Card Detail Modal ────────────────────────────────────────────────── -->
+<div id="cardDetailBackdrop" class="modal-backdrop card-detail-backdrop" onclick="closeCardDetail()">
+  <div class="card-detail-modal" onclick="event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="cdm_name">
+    <button class="modal-x-btn" onclick="closeCardDetail()" aria-label="Close">✕</button>
+
+    <div class="card-detail-layout">
+      <!-- Left: Image -->
+      <div class="card-detail-img-panel">
+        <div class="card-detail-img-wrapper">
+          <img id="cdm_image" class="card-detail-img" loading="lazy" alt="Card image">
+          <div id="cdm_fav_badge" class="cdm-fav-badge hidden">❤️</div>
+        </div>
+        <div class="cdm-img-actions">
+          <button class="btn btn-gold btn-sm" id="cdm_fav_btn" onclick="toggleCardDetailFavorite()">
+            <span id="cdm_fav_icon">🤍</span> <span id="cdm_fav_text">Add Favorite</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right: Info -->
+      <div class="card-detail-info-panel">
+        <!-- View Mode -->
+        <div id="cdm_view_mode">
+          <div class="cdm-header">
+            <div class="cdm-type-badge" id="cdm_type_badge"></div>
+            <div class="cdm-rarity-badge" id="cdm_rarity_badge"></div>
+          </div>
+          <h2 class="cdm-name" id="cdm_name"></h2>
+
+          <div class="cdm-meta-grid">
+            <div class="cdm-meta-item">
+              <span class="cdm-meta-label">Set</span>
+              <span class="cdm-meta-value" id="cdm_set">—</span>
+            </div>
+            <div class="cdm-meta-item">
+              <span class="cdm-meta-label">Card #</span>
+              <span class="cdm-meta-value" id="cdm_card_number">—</span>
+            </div>
+            <div class="cdm-meta-item">
+              <span class="cdm-meta-label">Binder</span>
+              <span class="cdm-meta-value" id="cdm_binder">—</span>
+            </div>
+            <div class="cdm-meta-item">
+              <span class="cdm-meta-label">Added</span>
+              <span class="cdm-meta-value" id="cdm_date">—</span>
+            </div>
+          </div>
+
+          <div class="cdm-notes-section">
+            <div class="cdm-meta-label">Notes</div>
+            <div class="cdm-notes-text" id="cdm_notes_text">No notes added.</div>
+          </div>
+        </div>
+
+        <!-- Edit Mode (hidden by default) -->
+        <div id="cdm_edit_mode" class="hidden">
+          <div class="form-row">
+            <label class="form-label">Card Name</label>
+            <input type="text" id="cdm_edit_name" class="input-text" maxlength="120">
+          </div>
+          <div class="form-row">
+            <label class="form-label">Pokémon Type</label>
+            <div class="type-grid" id="cdm_edit_types"></div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">Rarity</label>
+            <select id="cdm_edit_rarity" class="input-text">
+              <option value="">— None —</option>
+              <option>Common</option>
+              <option>Uncommon</option>
+              <option>Rare</option>
+              <option>Super Rare</option>
+              <option>Baby Shiny</option>
+              <option>Rare Shiny</option>
+              <option>Ilusration Rare(IR)</option>
+              <option>Special Art Rare (SAR)</option>
+              <option>Special Ilustration Art Rare</option>
+              <option>Gold</option>
+            </select>
+          </div>
+          <div class="form-two-col">
+            <div class="form-row">
+              <label class="form-label">Set Name</label>
+              <select id="cdm_edit_set" class="input-text" onchange="onSetSelectionChange('cdm_edit_set', 'cdm_edit_set_total')">
+                <option value="">— None —</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label class="form-label">Card #</label>
+              <input type="number" id="cdm_edit_card_number" class="input-text" min="1">
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">Set Total Cards</label>
+            <input type="number" id="cdm_edit_set_total" class="input-text" min="1" readonly>
+          </div>
+          <div class="form-row">
+            <label class="form-label">Notes</label>
+            <textarea id="cdm_edit_notes" class="input-text" rows="3" style="resize:vertical" placeholder="Personal notes about this card..."></textarea>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="cdm-actions">
+          <button class="btn btn-outline btn-sm" id="cdm_edit_toggle_btn" onclick="toggleCardDetailEdit()">✏️ Edit</button>
+          <button class="btn btn-gold btn-sm hidden" id="cdm_save_btn" onclick="saveCardEdit()">💾 Save</button>
+          <button class="btn btn-outline btn-sm hidden" id="cdm_cancel_btn" onclick="cancelCardEdit()">✕ Cancel</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteDetailCard()">🗑️ Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
-<!-- Application Logic -->
 <script src="app.js"></script>
-
 </body>
 </html>

@@ -1,18 +1,10 @@
 from sqlalchemy import (
     Column, Integer, String, LargeBinary, ForeignKey,
-    DateTime, CheckConstraint, UniqueConstraint, Table, func,
+    DateTime, CheckConstraint, UniqueConstraint, func,
+    Boolean, Text,
 )
 from sqlalchemy.orm import relationship
 from database import Base
-
-
-# ── Association table ────────────────────────────────────────────────────────
-card_tags = Table(
-    "card_tags",
-    Base.metadata,
-    Column("card_id", Integer, ForeignKey("cards.id",  ondelete="CASCADE"), primary_key=True),
-    Column("tag_id",  Integer, ForeignKey("tags.id",   ondelete="CASCADE"), primary_key=True),
-)
 
 
 # ── Binder ───────────────────────────────────────────────────────────────────
@@ -40,26 +32,29 @@ class Card(Base):
         UniqueConstraint("binder_id", "slot", name="uq_cards_binder_slot"),
     )
 
-    id         = Column(Integer, primary_key=True, index=True)
-    binder_id  = Column(Integer, ForeignKey("binders.id", ondelete="CASCADE"), nullable=False, index=True)
-    name       = Column(String(120), nullable=False)
-    slot       = Column(Integer, nullable=False)
-    card_type  = Column(String(20), nullable=False)
-    image_data = Column(LargeBinary, nullable=False)
-    image_mime = Column(String(50), nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    id              = Column(Integer, primary_key=True, index=True)
+    binder_id       = Column(Integer, ForeignKey("binders.id", ondelete="CASCADE"), nullable=False, index=True)
+    name            = Column(String(120), nullable=False)
+    slot            = Column(Integer, nullable=False)
+    card_type       = Column(String(20), nullable=False)
+    image_data      = Column(LargeBinary, nullable=False)
+    image_mime      = Column(String(50), nullable=False)
+    created_at      = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    # ── New columns (Migration V2) ─────────────────────────────────────────────
+    favorite        = Column(Boolean, nullable=False, default=False, server_default="false")
+    rarity          = Column(String(30), nullable=True)
+    notes           = Column(Text, nullable=True)
+    set_name        = Column(String(120), nullable=True)
+    set_total_cards = Column(Integer, nullable=True)
+    card_number     = Column(Integer, nullable=True)
+    date_updated    = Column(DateTime(timezone=True), nullable=True)
 
     binder = relationship("Binder", back_populates="cards")
-    tags   = relationship("Tag", secondary=card_tags, back_populates="cards")
 
 
-# ── Tag ──────────────────────────────────────────────────────────────────────
-class Tag(Base):
-    __tablename__ = "tags"
-
-    id         = Column(Integer, primary_key=True, index=True)
-    name       = Column(String(50), nullable=False, unique=True)
-    color      = Column(String(20), nullable=False, default="#ffcb05")
-    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-
-    cards = relationship("Card", secondary=card_tags, back_populates="tags")
+# ── CardSet ──────────────────────────────────────────────────────────────────
+class CardSet(Base):
+    __tablename__ = "card_sets"
+    id          = Column(Integer, primary_key=True, index=True)
+    name        = Column(String(120), unique=True, nullable=False)
+    total_cards = Column(Integer, nullable=False)
