@@ -10,9 +10,12 @@ A premium, full-stack web application for Pokémon Card collectors to digitize, 
 - **Card Images in Database**: Images are stored directly in PostgreSQL (`BYTEA`), meaning no broken links or missing files when migrating!
 - **Glassmorphism UI**: High-end translucent panels, CSS grid layouts, and a responsive sidebar.
 - **Holographic Shimmer**: Realistic, CSS-only holographic glares that dynamically shift when you hover over cards.
-- **Card Tagging & Filtering**: Assign custom colored tags alongside a mandatory core **Pokémon Type** (*Fire, Water, Grass, etc.*). The app supports real-time multi-filtering.
+- **Card Tagging & Advanced Filtering**: Assign custom colored tags alongside a mandatory core **Pokémon Type** (*Fire, Water, Grass, etc.*). Filter cards by name, types, rarities, sets, and special states (favorites, recently added).
+- **Interactive Dashboard**: Rich stats panel with responsive Chart.js visual charts (Types distribution, Rarities, and Collection Size/Value Growth over time), collection highlights, and a list of recently added cards.
+- **Favorites Management**: A dedicated page to showcase your favorited cards, supporting Grid/List views, sorting (by Name, Date, Rarity), and quick highlights.
+- **Set Completion Progress**: A dedicated Sets page showing all active card sets, card counts, completion progress bars, and completion status filters.
+- **Detailed Card View & Inline Editing**: Click any card to view detailed metadata, write custom notes, toggle favorite status, or edit card details (name, types, rarity, set number) in-line.
 - **Export to PDF**: Generate high-quality printable A4 PDFs of your entire binder with proper pocket layouts, card metadata, and binder stats!
-- **Stats Dashboard**: Live insights showing filled vs. empty slots, page counts, and unique tags at a glance.
 
 ---
 
@@ -28,6 +31,7 @@ A premium, full-stack web application for Pokémon Card collectors to digitize, 
 
 **Frontend**
 - Vanilla HTML5 / CSS3 / ES6 JavaScript
+- Chart.js (for data visualizations and analytics)
 - No build tools required (no React, no Node.js build step)
 - Google Fonts (`Inter` & `Bangers`)
 
@@ -51,6 +55,7 @@ psql -U postgres -d pokemon_binder -f schema.sql
 psql -U postgres -d pokemon_binder -f migration.sql
 psql -U postgres -d pokemon_binder -f migration_type.sql
 psql -U postgres -d pokemon_binder -f migration_pages.sql
+psql -U postgres -d pokemon_binder -f migration_v2.sql
 ```
 *(If prompted for a password, enter your PostgreSQL password, default is usually `postgres`)*
 
@@ -98,7 +103,8 @@ pokemon_binder/
 ├── schema.sql             # Base database table creation
 ├── migration.sql          # Adds Tags feature tables
 ├── migration_type.sql     # Adds Pokémon Type column
-└── migration_pages.sql    # Increases max pages to 200
+├── migration_pages.sql    # Increases max pages to 200
+└── migration_v2.sql       # Adds support for custom Sets, Favorites, and Card details/notes
 ```
 
 ---
