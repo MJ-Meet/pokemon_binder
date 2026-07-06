@@ -883,9 +883,9 @@ function renderSets() {
 
   // Status filter
   if (setsStatusFilter === 'complete') {
-    filtered = filtered.filter(s => s.total > 0 && s.collected >= s.total);
+    filtered = filtered.filter(s => s.set_total_cards > 0 && s.collected >= s.set_total_cards);
   } else if (setsStatusFilter === 'incomplete') {
-    filtered = filtered.filter(s => !s.total || s.collected < s.total);
+    filtered = filtered.filter(s => !s.set_total_cards || s.collected < s.set_total_cards);
   }
 
   // Search
@@ -894,9 +894,9 @@ function renderSets() {
 
   // Sort
   if (setsSortMode === 'pct_desc') {
-    filtered.sort((a, b) => (b.collected / (b.total || 1)) - (a.collected / (a.total || 1)));
+    filtered.sort((a, b) => (b.collected / (b.set_total_cards || 1)) - (a.collected / (a.set_total_cards || 1)));
   } else if (setsSortMode === 'pct_asc') {
-    filtered.sort((a, b) => (a.collected / (a.total || 1)) - (b.collected / (b.total || 1)));
+    filtered.sort((a, b) => (a.collected / (a.set_total_cards || 1)) - (b.collected / (b.set_total_cards || 1)));
   } else if (setsSortMode === 'name_asc') {
     filtered.sort((a, b) => a.set_name.localeCompare(b.set_name));
   } else if (setsSortMode === 'collected_desc') {
@@ -911,7 +911,7 @@ function renderSets() {
   empty.classList.add('hidden');
 
   grid.innerHTML = filtered.map(s => {
-    const pct = s.total ? Math.round((s.collected / s.total) * 100) : null;
+    const pct = s.set_total_cards ? Math.round((s.collected / s.set_total_cards) * 100) : null;
     const isComplete = pct === 100;
 
     let badgeClass = 'badge-0', fillClass = 'fill-0', badgeText = 'Unknown';
@@ -931,7 +931,7 @@ function renderSets() {
         </div>
         <div class="set-progress-bar-wrapper">
           <div class="set-progress-stats">
-            <span>${s.collected} of ${s.total || '?'} cards</span>
+            <span>${s.collected} of ${s.set_total_cards || '?'} cards</span>
             <span class="set-progress-pct">${pct !== null ? pct + '%' : 'Unknown total'}</span>
           </div>
           <div class="set-progress-bar-bg">
@@ -940,7 +940,10 @@ function renderSets() {
         </div>
         <div class="set-card-footer">
           <span>📦 ${s.collected} collected</span>
-          ${s.total ? `<span>🎯 ${s.total - s.collected} remaining</span>` : ''}
+          ${s.set_total_cards ? `<span>🎯 ${s.set_total_cards - s.collected} remaining</span>` : ''}
+          <button class="set-delete-btn" onclick="event.stopPropagation(); deleteSet(${s.set_id}, '${esc(s.set_name)}')" title="Remove set">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+          </button>
         </div>
       </div>
     `;
@@ -961,6 +964,23 @@ function filterSetsByStatus(status) {
     if (btn) btn.classList.toggle('active', s === status);
   });
   renderSets();
+}
+
+async function deleteSet(setId, setName) {
+  if (!confirm(`Remove the set "${setName}"? Cards in this set will have their set cleared.`)) return;
+  try {
+    const resp = await fetch(`${API}/card-sets/${setId}`, { method: 'DELETE' });
+    if (!resp.ok && resp.status !== 204) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.detail || `Server error ${resp.status}`);
+    }
+    // Remove from local cache
+    allCardSets = allCardSets.filter(s => s.id !== setId);
+    notify('Set removed');
+    loadSets();
+  } catch (e) {
+    notify(`Failed to remove set: ${e.message}`, true);
+  }
 }
 
 // ── Modals ────────────────────────────────────────────────────────────────────

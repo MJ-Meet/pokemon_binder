@@ -87,6 +87,7 @@ class CardSetOut(BaseModel):
 
 
 class SetStats(BaseModel):
+    set_id:          int
     set_name:        str
     set_total_cards: Optional[int]
     collected:       int

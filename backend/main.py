@@ -403,6 +403,7 @@ def get_sets(db: Session = Depends(get_db)):
         pct = round((collected / cset.total_cards) * 100, 1) if cset.total_cards > 0 else 0.0
         
         results.append(schemas.SetStats(
+            set_id=cset.id,
             set_name=cset.name,
             set_total_cards=cset.total_cards,
             collected=collected,
@@ -429,6 +430,22 @@ def create_card_set(payload: schemas.CardSetCreate, db: Session = Depends(get_db
     db.commit()
     db.refresh(new_set)
     return new_set
+
+
+@app.delete("/card-sets/{set_id}", status_code=204)
+def delete_card_set(set_id: int, db: Session = Depends(get_db)):
+    """Delete a card set. Cards referencing this set will have their set_name cleared."""
+    card_set = db.query(models.CardSet).filter(models.CardSet.id == set_id).first()
+    if not card_set:
+        raise HTTPException(status_code=404, detail="Card set not found")
+    # Clear set_name on cards that reference this set
+    db.query(models.Card).filter(models.Card.set_name == card_set.name).update(
+        {models.Card.set_name: None, models.Card.set_total_cards: None},
+        synchronize_session="fetch",
+    )
+    db.delete(card_set)
+    db.commit()
+    return None
 
 
 # ──────────────────────────────────────────────────────────────────────────────

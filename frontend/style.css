@@ -475,6 +475,14 @@ body::before {
 }
 .set-card-footer span { display: flex; align-items: center; gap: 0.375rem; }
 
+.set-delete-btn {
+  margin-left: auto; background: transparent; border: 1px solid var(--border);
+  color: var(--text-dim); border-radius: var(--radius-sm); padding: 0.35rem;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: var(--transition); flex-shrink: 0;
+}
+.set-delete-btn:hover { background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.4); color: #f87171; }
+
 /* ─── Card Detail Modal ─────────────────────────────────────────────────────── */
 .card-detail-backdrop.modal-backdrop { align-items: center; }
 
