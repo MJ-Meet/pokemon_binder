@@ -69,6 +69,7 @@ Whether you are completing your **Gen 1 Kanto Master Set** or tracking all **1,0
 
 ### 🪪 Trainer Passport & Regional Gym Badges
 - **Live Regional Progress Tracking**: Displays precise completion rates for each of the 9 Pokémon world regions (Kanto, Johto, Hoenn, Sinnoh, Unova, Kalos, Alola, Galar, and Paldea).
+- **Customizable Partner Pokémon**: Tap your avatar frame to pick any companion Pokémon (all 1,025 species supported or instant iconic presets) and customize the badge frame background color.
 - **Pixel-Art Gym Badges**: 8 regional badges displayed with authentic pixel typography and dynamic badge alignment.
 - **Active Binder Sync**: Updates on-the-fly as cards are added or removed from the currently active binder.
 
@@ -79,6 +80,7 @@ Whether you are completing your **Gen 1 Kanto Master Set** or tracking all **1,0
 
 ### 🔍 TCG Spec Showcase Modal
 - **Comprehensive Card Breakdown**: Displays Set Name, Rarity tier, Card Number (`#143/142`), Region, and Date Added in a retro pixel-font specs table.
+- **Rock-Solid Alignment & Favorites Toggle**: One-click heart toggle with active highlight and 100% stable, zero-shift card alignment.
 - **Jump to Page Navigation**: Instantly opens the exact binder page where the card is placed with a single click.
 - **Inline Editing & Armed Delete Protection**: Edit card details directly or safely delete cards with instant UI updates and confirmation safeguards.
 
