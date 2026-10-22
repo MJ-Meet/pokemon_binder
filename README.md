@@ -1,173 +1,313 @@
-# PokéBinder 🎴
+<div align="center">
 
-A premium, full-stack web application for Pokémon Card collectors to digitize, organize, and showcase their collections.
+  <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png" width="90" height="90" alt="PokéBinder Master Ball" />
+
+  # ⚡ POKÉBINDER ⚡
+  ### The Ultimate National Pokédex Portfolio & 3D Interactive TCG Card Binder
+
+  <p align="center">
+    <strong>Digitize • Organize • Showcase • Master All 1,025 Pokémon Across 9 Generations</strong>
+  </p>
+
+  <p align="center">
+    <a href="https://github.com/MJ-Meet/pokemon_binder"><img src="https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" /></a>
+    <a href="https://github.com/MJ-Meet/pokemon_binder"><img src="https://img.shields.io/badge/Python_3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" /></a>
+    <a href="https://github.com/MJ-Meet/pokemon_binder"><img src="https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" /></a>
+    <a href="https://github.com/MJ-Meet/pokemon_binder"><img src="https://img.shields.io/badge/ES6_JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" /></a>
+    <a href="https://github.com/MJ-Meet/pokemon_binder"><img src="https://img.shields.io/badge/CSS3_Glassmorphism-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3" /></a>
+    <a href="https://github.com/MJ-Meet/pokemon_binder"><img src="https://img.shields.io/badge/Chart.js_4.x-FF6384?style=for-the-badge&logo=chartdotjs&logoColor=white" alt="Chart.js" /></a>
+  </p>
+
+  <p align="center">
+    <a href="#-features">✨ Features</a> •
+    <a href="#-interactive-3d-card-physics">🎴 3D Physics</a> •
+    <a href="#-the-9-pokemon-regions">🗺️ 9 Regions</a> •
+    <a href="#-card-studio--live-preview">🎨 Card Studio</a> •
+    <a href="#-architecture">🏗️ Architecture</a> •
+    <a href="#-quick-start">🚀 Quickstart</a> •
+    <a href="#-api-reference">🔌 API</a>
+  </p>
+
+</div>
+
+---
+
+## 🌟 Overview
+
+**PokéBinder** is a full-stack digital Pokémon Trading Card binder and portfolio system built for serious collectors and Pokédex enthusiasts. It blends the nostalgia of physical Pokémon 9-pocket and 16-pocket binders with web technologies: **genuine 3D card flips**, **dynamic holographic glares**, **PostgreSQL binary image preservation (`BYTEA`)**, **interactive Trainer Passports**, and a live **Card Studio**.
+
+Whether you are completing your **Gen 1 Kanto Master Set** or tracking all **1,025 National Pokédex species** up to Paldea, PokéBinder gives you an authentic, reactive, and breathtaking digital collecting experience.
+
+---
 
 ## ✨ Features
 
-- **1,025 National Pokédex Support**: Full coverage from Bulbasaur (#0001) to Pecharunt (#1025) backed by a structured Pokédex dataset and official PokeAPI high-res artwork.
-- **Interactive 3D Card Flip**: Authentic 3D card flips with CSS `transform-style: preserve-3d` and smooth `rotateY(180deg)` animations, realistic card backs, and quick-add actions for missing slots.
-- **Card Detail Showcase Modal**: TCG-inspired detail showcase featuring high-res artwork, full specs table (Set, Rarity, Card #, Region, Date Added), inline notes, jump-to-page navigation, and edit/delete tools.
-- **Card Studio & Live Preview**: Two-column card upload studio featuring real-time card preview (dynamic type badge, rarity text, official/custom artwork, dex ID) and animated type pills.
-- **Trainer Card & Regional Gym Badges**: Interactive trainer passport tracking collection percentages across all 9 Pokémon regions (Kanto through Paldea) with aligned badges.
-- **Multi-Binder Architecture**: Manage multiple binders independently with custom theme colors, pocket layouts (4, 9, or 16-pocket grids), and live card counts.
-- **Card Images in Database**: Images are stored directly in PostgreSQL (`BYTEA`), meaning no broken links or missing files when migrating!
-- **Holographic Shimmer & Glassmorphism**: High-end translucent panels, CSS grid layouts, and realistic holographic glares that dynamically shift when hovering over cards.
-- **Pokémon Type System**: Full support for 10 core types — *Fire, Water, Grass, Electric, Psychic, Fighting, Dark, Steel, Dragon,* and *Colorless* — with type colors, icons, and glow effects.
-- **Rarity Tiers**: Classify cards across 10 rarity levels — from *Common* up to *Gold*, including TCG-specific tiers like *Baby Shiny*, *Special Art Rare (SAR)*, and *Special Illustration Art Rare*.
-- **Advanced Filtering & Search**: Filter cards by name, Pokémon type, rarity, set name, favorites-only, and recently added (7-day window) with removable filter chips.
-- **Interactive Dashboard**: Rich analytics panel with Chart.js visualizations (Type distribution doughnut, Rarity breakdown, Collection Growth over time), collection highlights, and fill-rates.
-- **Favorites Management**: Dedicated page to showcase favorited cards with Grid/List views, sorting (Newest, Oldest, Name A–Z, By Rarity), and quick highlight strips.
-- **Explicit Set Management**: Create and track card expansions independently with card counts, completion progress bars, search, and status filters.
-- **Export to PDF**: Generate high-quality printable A4 PDFs of your entire binder with proper pocket layouts, card artwork, name labels, and binder stats in the footer.
-- **Auto-Detect Environment**: The frontend automatically detects local vs. production environments and switches the API base URL accordingly.
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                           POKÉBINDER SUITE                               │
+├──────────────────────┬──────────────────────┬────────────────────────────┤
+│  🎴 3D Card Physics  │  🌐 1,025 Pokédex    │  🪪 Trainer Passport       │
+│  Flip, sleeve glare  │  All 9 Generations   │  Badges & Regional stats   │
+├──────────────────────┼──────────────────────┼────────────────────────────┤
+│  🎨 Card Studio Live │  🔍 TCG Spec Modal   │  📊 Pro Analytics          │
+│  Real-time preview   │  Full card breakdown │  Chart.js visual insights  │
+├──────────────────────┼──────────────────────┼────────────────────────────┤
+│  🗄️ Database BYTEA   │  🖨️ A4 PDF Exporter  │  🎛️ Multi-Binder Switcher  │
+│  Zero broken links   │  Printable portfolios│  Independent collections   │
+└──────────────────────┴──────────────────────┴────────────────────────────┘
+```
+
+### 🎴 Interactive 3D Card Physics
+- **Realistic 3D Card Flips**: Experience genuine CSS 3D perspective flips (`transform-style: preserve-3d; rotateY(180deg)`) with smooth 500ms easing.
+- **Authentic Card Back & Sleeves**: Flip collected cards to inspect backs, or flip missing cards to reveal uncollected silhouette stamps with quick-add actions (`+`).
+- **Dynamic Holographic Glare**: Multi-layered diagonal shimmer effect that dynamically responds as your cursor glides across the card surface.
+
+### 🌐 Complete 1,025 National Pokédex
+- **All 9 Generations Pre-Configured**: Backed by a clean, structured [pokedex_data.js](frontend/pokedex_data.js) database spanning from `#0001 Bulbasaur` to `#1025 Pecharunt`.
+- **Automatic High-Res Artwork**: Automatically fetches official PokeAPI master artwork for missing slots, with instant fallback support.
+- **Region Classification**: Instant auto-tagging of regions, generations, and dual-typing for every slot.
+
+### 🪪 Trainer Passport & Regional Gym Badges
+- **Live Regional Progress Tracking**: Displays precise completion rates for each of the 9 Pokémon world regions (Kanto, Johto, Hoenn, Sinnoh, Unova, Kalos, Alola, Galar, and Paldea).
+- **Pixel-Art Gym Badges**: 8 regional badges displayed with authentic pixel typography and dynamic badge alignment.
+- **Active Binder Sync**: Updates on-the-fly as cards are added or removed from the currently active binder.
+
+### 🎨 Card Studio & Live Holographic Preview
+- **Two-Column Creator Studio**: An intuitive modal with form controls on the right and an interactive, real-time live preview card on the left.
+- **Dynamic Reactive Preview**: As you type the Pokémon name, pick a rarity, or change the type, the preview card instantly recalculates its badge colors, glow effects, and official art.
+- **Drag-and-Drop Artwork Uploader**: Upload custom TCG card scans with live thumbnailing, or let the app automatically generate official artwork.
+
+### 🔍 TCG Spec Showcase Modal
+- **Comprehensive Card Breakdown**: Displays Set Name, Rarity tier, Card Number (`#143/142`), Region, and Date Added in a retro pixel-font specs table.
+- **Jump to Page Navigation**: Instantly opens the exact binder page where the card is placed with a single click.
+- **Inline Editing & Armed Delete Protection**: Edit card details directly or safely delete cards with instant UI updates and confirmation safeguards.
+
+### 📊 Pro Collector Analytics & Management
+- **Chart.js Visualizations**: Type distribution doughnut chart, Rarity tier breakdown, and cumulative collection growth curve.
+- **Favorites Showcase**: Dedicated gallery for your crown jewels with instant sorting (Rarity, Date Added, Name A–Z) and Grid/List views.
+- **Set Expansion Tracker**: Manage card sets independently with progress bars, completion percentages, and status filters.
+- **Printable A4 PDF Export**: Export entire binders directly into printable A4 PDFs with card artwork, labels, and statistics.
+
+---
+
+## 🗺️ The 9 Pokémon Regions
+
+PokéBinder tracks the complete saga of the Pokémon world across all 9 canonical regions:
+
+| Gen | Region | National Dex ID | Iconic Starters | Signature Gym Badges |
+|:---:|:---|:---:|:---|:---|
+| **I** | **Kanto** | `#0001` – `#0151` | Bulbasaur • Charmander • Squirtle | Boulder, Cascade, Thunder, Rainbow, Soul, Marsh, Volcano, Earth |
+| **II** | **Johto** | `#0152` – `#0251` | Chikorita • Cyndaquil • Totodile | Zephyr, Hive, Plain, Fog, Storm, Mineral, Glacier, Rising |
+| **III** | **Hoenn** | `#0252` – `#0386` | Treecko • Torchic • Mudkip | Stone, Knuckle, Dynamo, Heat, Balance, Feather, Mind, Rain |
+| **IV** | **Sinnoh** | `#0387` – `#0493` | Turtwig • Chimchar • Piplup | Coal, Forest, Cobble, Fen, Relic, Mine, Icicle, Beacon |
+| **V** | **Unova** | `#0494` – `#0649` | Snivy • Tepig • Oshawott | Trio, Basic, Insect, Bolt, Quake, Jet, Freeze, Legend |
+| **VI** | **Kalos** | `#0650` – `#0721` | Chespin • Fennekin • Froakie | Bug, Cliff, Rumble, Plant, Voltage, Fairy, Psychic, Iceberg |
+| **VII** | **Alola** | `#0722` – `#0809` | Rowlet • Litten • Popplio | Melemele, Akala, Ula'ula, Poni Island Trial Stamps |
+| **VIII** | **Galar** | `#0810` – `#0905` | Grookey • Scorbunny • Sobble | Grass, Water, Fire, Fighting/Ghost, Fairy, Rock/Ice, Dark, Dragon |
+| **IX** | **Paldea** | `#0906` – `#1025` | Sprigatito • Fuecoco • Quaxly | Cortondo, Artazon, Levincia, Cascarrafa, Medali, Montenevera, Alfornada, Glaseado |
+
+---
+
+## ⚡ Pokémon Type & Rarity Matrix
+
+### Core Pokémon Types
+```
+ 🔥 FIRE       💧 WATER      🌿 GRASS      ⚡ ELECTRIC    👁️ PSYCHIC
+ 🥊 FIGHTING   🌑 DARK       ⚙️ STEEL      🐲 DRAGON      ⚪ COLORLESS
+```
+
+### Official TCG Rarity Tiers
+- **Common (C)** • **Uncommon (U)** • **Rare (R)** • **Super Rare (SR)**
+- **Baby Shiny (S)** • **Rare Shiny (SSR)**
+- **Illustration Rare (IR)** • **Special Art Rare (SAR)** • **Special Illustration Rare (SIR)** • **Gold Hyper Rare (UR)**
+
+---
+
+## 🏗️ Architecture
+
+```
+                    ┌──────────────────────────────────────────────┐
+                    │               CLIENT BROWSER                 │
+                    │   Vanilla HTML5 + Modern CSS3 + Vanilla ES6  │
+                    │   • 3D Card Physics   • Chart.js Dashboards  │
+                    │   • Live Card Studio  • National Pokédex UI  │
+                    └──────────────────────┬───────────────────────┘
+                                           │ HTTP REST / JSON
+                                           ▼
+                    ┌──────────────────────────────────────────────┐
+                    │             FASTAPI REST BACKEND             │
+                    │      (Python 3.11+ / Uvicorn ASGI Server)     │
+                    │   • Auto-Migrations   • PDF Generator        │
+                    │   • Multipart Uploads • Pydantic Validations │
+                    └───────┬──────────────────────────────┬───────┘
+                            │                              │
+                            ▼                              ▼
+             ┌─────────────────────────────┐  ┌───────────────────────────┐
+             │     POSTGRESQL DATABASE     │  │      PokeAPI SPRITES      │
+             │  • Binders, Cards, Sets     │  │   Official Master Artwork │
+             │  • Binary Images (BYTEA)    │  │   Sprites (1–1,025)       │
+             └─────────────────────────────┘  └───────────────────────────┘
+```
 
 ---
 
 ## 🛠️ Tech Stack
 
-**Backend**
-- Python 3.11+
-- FastAPI (REST API framework)
-- PostgreSQL (Database)
-- SQLAlchemy (ORM)
-- Pydantic v2 (Data Validation)
-- python-dotenv (Environment configuration)
-- fpdf2 & Pillow (PDF Generation)
-
-**Frontend**
-- Vanilla HTML5 / CSS3 / ES6 JavaScript
-- Chart.js 4.x (Data visualizations and analytics)
-- No build tools required (no React, no Node.js build step)
-- Google Fonts (`Inter` & `Press Start 2P` pixel font)
+<table width="100%">
+  <tr>
+    <td width="50%" valign="top">
+      <h3>Backend Engine</h3>
+      <ul>
+        <li><strong>Language</strong>: Python 3.11+</li>
+        <li><strong>Framework</strong>: <a href="https://fastapi.tiangolo.com/">FastAPI</a> (High-performance ASGI)</li>
+        <li><strong>Database</strong>: <a href="https://www.postgresql.org/">PostgreSQL</a> with raw <code>BYTEA</code> image preservation</li>
+        <li><strong>ORM</strong>: <a href="https://www.sqlalchemy.org/">SQLAlchemy 2.x</a></li>
+        <li><strong>Validation</strong>: <a href="https://docs.pydantic.dev/">Pydantic v2</a></li>
+        <li><strong>PDF Generation</strong>: <code>fpdf2</code> & <code>Pillow</code></li>
+      </ul>
+    </td>
+    <td width="50%" valign="top">
+      <h3>Frontend Experience</h3>
+      <ul>
+        <li><strong>Core</strong>: Vanilla HTML5, Modern CSS3, Modular ES6+</li>
+        <li><strong>Styling</strong>: Glassmorphism, 3D Transforms, Custom Glows</li>
+        <li><strong>Analytics</strong>: <a href="https://www.chartjs.org/">Chart.js 4.x</a></li>
+        <li><strong>Typography</strong>: Google Fonts (<code>Inter</code> & <code>Press Start 2P</code>)</li>
+        <li><strong>Zero Dependencies</strong>: No Webpack, Vite, React, or Node.js runtime needed</li>
+      </ul>
+    </td>
+  </tr>
+</table>
 
 ---
 
-## 🚀 Setup & Installation
+## 🚀 Quick Start
 
-### 1. Database Setup
-You need [PostgreSQL](https://www.postgresql.org/download/) installed and running. Create a new database named `pokemon_binder` and apply the base schema.
+### 1. Prerequisites
+- [Python 3.11+](https://www.python.org/downloads/)
+- [PostgreSQL](https://www.postgresql.org/download/)
+
+### 2. Database Initialization
+Create your PostgreSQL database and execute the initial schema:
 
 ```bash
-# Log into your Postgres shell
+# Open PostgreSQL prompt
 psql -U postgres
 
-# Create the database
+# Create database
 CREATE DATABASE pokemon_binder;
 \c pokemon_binder
 
-# Apply the base schema
+# Apply schema
 psql -U postgres -d pokemon_binder -f schema.sql
 ```
-*(If prompted for a password, enter your PostgreSQL password, default is usually `postgres`)*
 
-> **Note**: All migrations (card_type, favorites, rarity, notes, sets, card_sets table) are **applied automatically** when the FastAPI server starts. No manual migration steps are needed beyond the base schema.
+> **Automated Migrations**: All column additions (`card_type`, `rarity`, `favorites`, `notes`, `card_sets`) run **automatically** on server startup.
 
-### 2. Backend Setup
-Set up the Python environment, configure the database URL, and install the required dependencies.
-
+### 3. Backend Setup
 ```bash
+# Navigate to backend
 cd backend
 
-# (Optional but recommended) Create a virtual environment
+# Create and activate virtual environment
 python -m venv venv
-venv\Scripts\activate   # Windows
-source venv/bin/activate # Mac/Linux
+venv\Scripts\activate      # Windows (PowerShell/CMD)
+source venv/bin/activate    # macOS / Linux
 
-# Install requirements
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-Create a `.env` file inside the `backend/` directory with your PostgreSQL connection string:
-
+Create a `.env` file in `backend/` with your database credentials:
 ```env
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/pokemon_binder
 ```
 
-### 3. Running the App
-Start the FastAPI server. By default it runs on `http://127.0.0.1:8000`.
-
+Start the FastAPI application:
 ```bash
-cd backend
 python -m uvicorn main:app --reload
 ```
+API server will spin up on **`http://127.0.0.1:8000`** with interactive Swagger documentation at **`http://127.0.0.1:8000/docs`**.
 
-Because the frontend is entirely Vanilla browser technologies, you can simply double-click the `frontend/index.html` file to open it in your browser! The frontend JavaScript auto-detects whether you're running locally (`localhost` / `127.0.0.1` / `file://`) and routes API calls to `http://localhost:8000`.
+### 4. Launch Frontend
+Since the frontend is built entirely on native browser web standards:
+- Simply open `frontend/index.html` in any modern web browser, **or**
+- Serve it via Python's built-in server:
+  ```bash
+  cd frontend
+  python -m http.server 3000
+  ```
+  Visit **`http://localhost:3000`** and begin building your collection!
 
 ---
 
-## 📂 Project Structure
+## 📂 Repository Structure
 
 ```text
-pokemon_binder/
+POKEMON Binder/
 ├── backend/
-│   ├── main.py            # FastAPI endpoints, routing, auto-migrations, PDF gen
-│   ├── models.py          # SQLAlchemy models (Binder, Card, CardSet)
-│   ├── schemas.py         # Pydantic request/response schemas
-│   ├── database.py        # Database engine & session (reads .env)
-│   └── requirements.txt   # Python pip packages
+│   ├── main.py            # FastAPI routes, auto-migrations, and PDF export logic
+│   ├── models.py          # SQLAlchemy ORM models (Binder, Card, CardSet)
+│   ├── schemas.py         # Pydantic request & response validation schemas
+│   ├── database.py        # Database engine, connection pooling, and session maker
+│   └── requirements.txt   # Python pip dependency requirements
 ├── frontend/
-│   ├── index.html         # App structure & all modal templates
-│   ├── style.css          # Glassmorphism, holographic shimmer, & animations
+│   ├── index.html         # Application layout, modals, and views
+│   ├── style.css          # Glassmorphism, 3D card flip, and holographic shaders
 │   ├── pokedex_data.js    # 1,025 National Pokédex dataset (Gens 1–9)
-│   └── app.js             # State management, API fetching, Chart.js, & routing
-├── schema.sql             # Base database table creation (binders + cards)
-├── vercel.json            # Vercel frontend deployment config
-├── netlify.toml           # Netlify frontend deployment config
-└── .gitignore             # Standard Python/Node/IDE ignores
+│   └── app.js             # State manager, 3D interactions, and Chart.js analytics
+├── schema.sql             # Base database table definitions
+├── vercel.json            # Vercel zero-config static deployment manifest
+├── netlify.toml           # Netlify publish directory configuration
+└── README.md              # Project documentation & reference manual
 ```
 
 ---
 
-## 🔌 API Endpoints
+## 🔌 API Reference
 
-| Method   | Endpoint                                | Description                                  |
-|----------|-----------------------------------------|----------------------------------------------|
-| `GET`    | `/`                                     | Health check                                 |
-| `GET`    | `/binders`                              | List all binders                             |
-| `POST`   | `/binders`                              | Create a new binder                          |
-| `GET`    | `/binders/{id}`                         | Get binder with all cards                    |
-| `PUT`    | `/binders/{id}`                         | Update binder settings                       |
-| `DELETE` | `/binders/{id}`                         | Delete a binder and all its cards            |
-| `POST`   | `/binders/{id}/cards`                   | Upload a new card (multipart form)           |
-| `GET`    | `/binders/{id}/cards/search?q=`         | Search cards within a binder                 |
-| `GET`    | `/binders/{id}/export`                  | Export binder as A4 PDF                      |
-| `GET`    | `/cards`                                | Global cross-binder card search with filters |
-| `GET`    | `/cards/{id}/image`                     | Serve card image (cached 24h)                |
-| `PATCH`  | `/cards/{id}`                           | Update card metadata (name, type, rarity, notes, set) |
-| `PUT`    | `/cards/{id}/move`                      | Move card to a different slot                |
-| `PUT`    | `/cards/{id}/favorite`                  | Toggle favorite flag                         |
-| `DELETE` | `/cards/{id}`                           | Delete a card                                |
-| `GET`    | `/favorites`                            | List all favorited cards                     |
-| `GET`    | `/sets`                                 | Get per-set completion statistics            |
-| `GET`    | `/card-sets`                            | List all managed card sets                   |
-| `POST`   | `/card-sets`                            | Create a new card set                        |
-| `DELETE` | `/card-sets/{id}`                       | Delete a card set (clears set_name on cards) |
-| `GET`    | `/stats`                                | Collection-wide statistics for dashboard     |
-
-Full interactive API docs are available at `/docs` (Swagger UI) when the server is running.
+| HTTP Method | Route | Description |
+|:---:|:---|:---|
+| `GET` | `/` | API status and health check |
+| `GET` | `/binders` | Retrieve all binders with card counts |
+| `POST` | `/binders` | Create a new custom binder |
+| `GET` | `/binders/{id}` | Fetch binder with all assigned cards |
+| `PUT` | `/binders/{id}` | Update binder name, pages, theme color, or grid size |
+| `DELETE` | `/binders/{id}` | Cascade delete a binder and its cards |
+| `POST` | `/binders/{id}/cards` | Upload a new card image (`BYTEA`) and metadata |
+| `GET` | `/binders/{id}/cards/search?q=` | Search cards within a specific binder |
+| `GET` | `/binders/{id}/export` | Generate and stream a printable A4 PDF portfolio |
+| `GET` | `/cards` | Global multi-filter card query engine |
+| `GET` | `/cards/{id}/image` | Stream binary card image with HTTP 24h cache |
+| `PATCH` | `/cards/{id}` | In-place update for card metadata, type, rarity, and notes |
+| `PUT` | `/cards/{id}/move` | Reorder card to a different binder slot |
+| `PUT` | `/cards/{id}/favorite` | Toggle card favorite status |
+| `DELETE` | `/cards/{id}` | Permanently remove a card from collection |
+| `GET` | `/favorites` | List all favorited cards across all binders |
+| `GET` | `/sets` | Calculate completion rates for all active sets |
+| `GET` | `/card-sets` | List all tracked card expansion sets |
+| `POST` | `/card-sets` | Register a new expansion set |
+| `DELETE` | `/card-sets/{id}` | Delete a tracked set |
+| `GET` | `/stats` | Collection-wide analytics for Chart.js dashboard |
 
 ---
 
-## 🌐 Deployment (Vercel & Netlify)
+## 🌐 Production Deployment
 
-Because this is a decoupled Full-Stack application, you can deploy the frontend securely and easily to Vercel or Netlify! The necessary configuration files (`vercel.json` and `netlify.toml`) are already included.
+### 1. Backend & Database (Render / Railway / Heroku)
+Deploy the `backend/` directory as a Python web service connected to a managed PostgreSQL instance. Add your `DATABASE_URL` environment variable in the host dashboard.
 
-### 1. Host the Backend First
-Vercel and Netlify are optimized for Frontend hosting. You should host your Python FastAPI backend and PostgreSQL database on a service like **Render**, **Railway**, or **Heroku**.
-* Once your backend is deployed, copy its live URL (e.g., `https://pokemon-binder-api.onrender.com`).
-
-### 2. Update the Frontend API URL
-In `frontend/app.js`, update line 3 replacing the `PROD_API` constant with your live backend URL:
-```javascript
-const PROD_API = 'https://your-backend-url.onrender.com';
-```
-The frontend automatically uses `PROD_API` when not running on `localhost`, `127.0.0.1`, or `file://`.
-
-### 3. Deploy Frontend
-* **Vercel**: Simply import the GitHub repository into Vercel. The `vercel.json` file will automatically route all traffic to the `frontend/` directory.
-* **Netlify**: Simply import the GitHub repository into Netlify. The `netlify.toml` file automatically sets the publish directory to `frontend/`.
+### 2. Frontend (Vercel / Netlify)
+PokéBinder includes pre-configured `vercel.json` and `netlify.toml` files:
+1. Connect your GitHub repository to Vercel or Netlify.
+2. In `frontend/app.js`, set `PROD_API` to your live backend endpoint:
+   ```javascript
+   const PROD_API = 'https://your-api.onrender.com';
+   ```
+3. Push to `main` — your frontend deploys in seconds with zero build steps!
 
 ---
 
-## 📝 License
-This project is made for educational and organizational purposes. Pokémon and Pokémon Card Designs belong to Nintendo, Creatures, and Game Freak.
+<div align="center">
+  <sub>Built with ❤️ for Pokémon trainers and collectors worldwide. Pokémon and its trademarks are © 1995–2026 Nintendo / Creatures Inc. / GAME FREAK inc.</sub>
+</div>
