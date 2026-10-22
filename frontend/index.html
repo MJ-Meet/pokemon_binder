@@ -3,125 +3,460 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PokéBinder — Premium Pokémon Card Manager</title>
-  <meta name="description" content="Organize, track, and showcase your Pokémon card collection with PokéBinder — the premium digital binder experience." />
+  <title>PokéBinder — National Pokédex & Pokémon Card Portfolio</title>
+  <meta name="description" content="Track your Pokémon collection and digital binder with the 1,025 National Pokédex portfolio." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Press+Start+2P&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
+<!-- SVG Definitions for Silhouette Filter -->
+<svg width="0" height="0" style="position:absolute;visibility:hidden" aria-hidden="true">
+  <defs>
+    <filter id="yellowSilhouette" color-interpolation-filters="sRGB">
+      <feColorMatrix type="matrix" values="
+        0 0 0 0 1.00
+        0 0 0 0 0.831
+        0 0 0 0 0.00
+        0 0 0 1 0" />
+      <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#ffd400" flood-opacity="0.45" />
+    </filter>
+  </defs>
+</svg>
+
 <div id="app">
-  <!-- ─── Sidebar ─────────────────────────────────────────────────────────── -->
-  <aside class="sidebar">
-    <div class="sidebar-brand">
-      <div class="logo">Poké<span>Binder</span></div>
-    </div>
-
-    <!-- Nav Links -->
-    <nav class="sidebar-nav">
-      <button class="nav-link" id="navBinder" onclick="navigateTo('binder')">
-        <span class="nav-icon">📦</span> My Binders
-      </button>
-      <button class="nav-link" id="navDashboard" onclick="navigateTo('dashboard')">
-        <span class="nav-icon">📊</span> Dashboard
-      </button>
-      <button class="nav-link" id="navFavorites" onclick="navigateTo('favorites')">
-        <span class="nav-icon">❤️</span> Favorites
-      </button>
-      <button class="nav-link" id="navSets" onclick="navigateTo('sets')">
-        <span class="nav-icon">🏅</span> Set Progress
-      </button>
-    </nav>
-
-    <div class="sidebar-scroll">
-      <div class="section-label">MY COLLECTION</div>
-      <div id="binderList"></div>
-    </div>
-    <div class="sidebar-footer">
-      <button class="btn btn-gold" style="width:100%" onclick="openBinderModal()">
-        <svg fill="currentColor" width="16" height="16" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-        New Binder
-      </button>
-    </div>
-  </aside>
-
-  <!-- ─── Main Viewport ───────────────────────────────────────────────────── -->
-  <main class="viewport">
-    <div class="content-area">
-
-      <!-- ═══ BINDER PAGE ════════════════════════════════════════════════════ -->
-      <div id="binderPage">
-        <!-- Select State -->
-        <div id="binderEmptyState" class="empty-state">
-          <div class="empty-graphic">✨</div>
-          <h2 class="empty-title">POKÉBINDER</h2>
-          <p class="empty-desc">Your digital collection awaits. Select a binder from the sidebar or create a new one to start organizing.</p>
-          <button class="btn btn-gold" onclick="openBinderModal()">Create First Binder</button>
+  <!-- ─── Top Navigation Bar (Header) ────────────────────────────────────────── -->
+  <header class="top-nav-header">
+    <div class="nav-container">
+      <!-- Logo & Branding -->
+      <div class="nav-brand" onclick="navigateTo('home')">
+        <div class="nav-brand-logo-wrap" aria-label="PokéBinder Logo">
+          <svg class="modern-pokeball-svg" viewBox="0 0 100 100" width="38" height="38">
+            <defs>
+              <radialGradient id="topRedGrad" cx="35%" cy="30%" r="65%">
+                <stop offset="0%" stop-color="#ff4d6d"/>
+                <stop offset="45%" stop-color="#e60026"/>
+                <stop offset="85%" stop-color="#b3001b"/>
+                <stop offset="100%" stop-color="#73000d"/>
+              </radialGradient>
+              <radialGradient id="bottomWhiteGrad" cx="35%" cy="70%" r="65%">
+                <stop offset="0%" stop-color="#ffffff"/>
+                <stop offset="60%" stop-color="#f1f5f9"/>
+                <stop offset="85%" stop-color="#cbd5e1"/>
+                <stop offset="100%" stop-color="#94a3b8"/>
+              </radialGradient>
+              <linearGradient id="glossGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.75"/>
+                <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+              </linearGradient>
+              <linearGradient id="metalRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#e2e8f0"/>
+                <stop offset="50%" stop-color="#64748b"/>
+                <stop offset="100%" stop-color="#334155"/>
+              </linearGradient>
+              <radialGradient id="buttonCoreGrad" cx="40%" cy="35%" r="60%">
+                <stop offset="0%" stop-color="#ffffff"/>
+                <stop offset="60%" stop-color="#f8fafc"/>
+                <stop offset="85%" stop-color="#cbd5e1"/>
+                <stop offset="100%" stop-color="#64748b"/>
+              </radialGradient>
+            </defs>
+            <circle cx="50" cy="50" r="47" fill="#18181b"/>
+            <path d="M 5 50 A 45 45 0 0 0 95 50 Z" fill="url(#bottomWhiteGrad)"/>
+            <path d="M 5 50 A 45 45 0 0 1 95 50 Z" fill="url(#topRedGrad)"/>
+            <path d="M 12 45 A 42 42 0 0 1 88 45 Q 50 18 12 45 Z" fill="url(#glossGrad)"/>
+            <rect x="5" y="46.5" width="90" height="7" fill="#18181b"/>
+            <rect x="5" y="47.5" width="90" height="1.5" fill="#334155" opacity="0.6"/>
+            <circle cx="50" cy="50" r="17" fill="#18181b"/>
+            <circle cx="50" cy="50" r="13.5" fill="url(#metalRingGrad)"/>
+            <circle cx="50" cy="50" r="11" fill="#0f172a"/>
+            <circle cx="50" cy="50" r="8.5" fill="url(#buttonCoreGrad)"/>
+            <circle cx="48" cy="48" r="3" fill="#ffffff" opacity="0.9"/>
+          </svg>
         </div>
-
-        <!-- Active Binder View -->
-        <div id="binderMainView" class="hidden" style="display:contents">
-          <header id="headerSection" class="binder-header"></header>
-          <div id="statsSection" class="quick-stats"></div>
-
-          <!-- Controls -->
-          <div class="controls-bar">
-            <div class="controls-top-row">
-              <div class="search-input-group">
-                <svg class="search-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input type="text" id="searchInput" class="search-field" placeholder="Search by card name..." oninput="handleSearch(this.value)">
-              </div>
-              <button class="btn btn-outline btn-sm filter-toggle-btn" onclick="toggleFilterPanel()" id="filterToggleBtn">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h18M7 8h10M11 12h2"/></svg>
-                Filters
-              </button>
-            </div>
-
-            <!-- Advanced Filter Panel -->
-            <div id="filterPanel" class="filter-panel hidden">
-              <div class="filter-section">
-                <div class="filter-section-label">Pokémon Type</div>
-                <div class="filter-type-grid" id="filterTypeGrid"></div>
-              </div>
-              <div class="filter-section">
-                <div class="filter-section-label">Rarity</div>
-                <div class="filter-rarity-grid" id="filterRarityGrid"></div>
-              </div>
-              <div class="filter-section">
-                <div class="filter-section-label">Set Name</div>
-                <input type="text" id="filterSetInput" class="input-text input-sm" placeholder="Filter by set..." oninput="applyAdvancedFilter('set_name', this.value)">
-              </div>
-              <div class="filter-row-actions">
-                <label class="filter-checkbox-label">
-                  <input type="checkbox" id="filterFavOnly" onchange="applyAdvancedFilter('fav_only', this.checked)"> Favorites Only
-                </label>
-                <label class="filter-checkbox-label">
-                  <input type="checkbox" id="filterRecentOnly" onchange="applyAdvancedFilter('recent', this.checked)"> Recently Added (7d)
-                </label>
-                <button class="btn btn-outline btn-sm" onclick="clearAdvancedFilters()">Clear All ✕</button>
-              </div>
-            </div>
-
-            <!-- Active filter chips -->
-            <div id="activeFilterChips" class="active-filter-chips"></div>
-          </div>
-
-          <div id="paginationRows" class="pagination"></div>
-          <div id="cardContainer"></div>
+        <div class="brand-text">
+          <div class="brand-title">POKÉ<span>BINDER</span></div>
+          <div class="brand-subtitle">NATIONAL POKÉDEX (1–1,025)</div>
         </div>
       </div>
 
-      <!-- ═══ DASHBOARD PAGE ═════════════════════════════════════════════════ -->
-      <div id="dashboardPage" class="page hidden">
-        <div class="page-header">
-          <div>
-            <h1 class="page-title">📊 Collection Dashboard</h1>
-            <p class="page-subtitle">Your collection at a glance</p>
+      <!-- Center Nav Links -->
+      <nav class="nav-menu" id="topNavMenu">
+        <button class="nav-item active" id="navHome" onclick="navigateTo('home')">HOME</button>
+        <button class="nav-item" id="navBinder" onclick="navigateTo('binder')">BINDER</button>
+        <button class="nav-item" id="navSets" onclick="navigateTo('sets')">EXPANSIONS</button>
+        <button class="nav-item" id="navDashboard" onclick="navigateTo('dashboard')">DASHBOARD</button>
+        <button class="nav-item" id="navFavorites" onclick="navigateTo('favorites')">FAVORITES</button>
+      </nav>
+
+      <!-- Right Utility Actions -->
+      <div class="nav-actions">
+        <button class="nav-circle-btn" onclick="openBinderModal()" title="Create New Binder" aria-label="New Binder">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+        </button>
+        <button class="nav-mobile-toggle" onclick="toggleMobileNav()" aria-label="Toggle Navigation">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── Main Content Area ─────────────────────────────────────────────────── -->
+  <main class="page-body">
+    <div class="main-content-wrapper">
+
+      <!-- ═══ HOME PAGE (TRAINER CARD & ALL BINDERS) ══════════════════════════ -->
+      <div id="homePage" class="page-home">
+        <!-- Top Row: Trainer Card & Binder Summary -->
+        <div class="home-top-grid">
+          <!-- ── Trainer Card (Matching Reference) ── -->
+          <div class="trainer-card-wrapper">
+            <div class="trainer-card">
+              <!-- Top Red Header -->
+              <div class="tc-header">
+                <span class="tc-title">TRAINER CARD</span>
+                <span class="tc-id" id="tc_trainer_id">ID No. 897K</span>
+              </div>
+
+              <!-- Main White Card Body -->
+              <div class="tc-body">
+                <!-- Name & Partner Avatar Row -->
+                <div class="tc-profile-row">
+                  <div class="tc-name-group">
+                    <span class="tc-name-label">NAME :</span>
+                    <h2 class="tc-name" id="tc_trainer_name" onclick="editTrainerName()" title="Click to edit name">bamfies</h2>
+                  </div>
+                  <div class="tc-avatar-box" title="Partner Pokémon">
+                    <img id="tc_partner_img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1017.png" alt="Partner Pokémon" class="tc-avatar-img" />
+                  </div>
+                </div>
+
+                <!-- Stats Table -->
+                <div class="tc-stats-table">
+                  <div class="tc-stat-row">
+                    <span class="tc-stat-label">POKÉDEX</span>
+                    <span class="tc-stat-val tc-stat-red" id="tc_pokedex_stat">0 / 1025</span>
+                  </div>
+                  <div class="tc-stat-row">
+                    <span class="tc-stat-label">ACTIVE BINDER</span>
+                    <span class="tc-stat-val" id="tc_active_binder_name">—</span>
+                  </div>
+                  <div class="tc-stat-row">
+                    <span class="tc-stat-label">LOGGED CARDS</span>
+                    <span class="tc-stat-val" id="tc_logged_cards">0</span>
+                  </div>
+                  <div class="tc-stat-row">
+                    <span class="tc-stat-label">TARGET POKÉMON HIT</span>
+                    <span class="tc-stat-val tc-stat-teal" id="tc_target_hit">25</span>
+                  </div>
+                  <div class="tc-stat-row">
+                    <span class="tc-stat-label">TOTAL BINDERS</span>
+                    <span class="tc-stat-val" id="tc_total_binders">0</span>
+                  </div>
+                </div>
+
+                <!-- Gym Badges by Region (9/9) -->
+                <div class="tc-badges-section">
+                  <div class="tc-badges-header">
+                    <span class="tc-badges-title">GYM BADGES (9/9)</span>
+                    <span class="tc-badge-status" id="tc_badge_status">HOVER A BADGE</span>
+                  </div>
+
+                  <div class="tc-badges-strip" id="tcBadgesStrip">
+                    <!-- G1 Kanto -->
+                    <div class="tc-badge-item" data-gen="1" data-region="Kanto" data-total="151" onmouseenter="hoverBadge(1, 'Kanto', 151)" onmouseleave="resetBadgeHover()" onclick="openBinderRegion(1)">
+                      <div class="tc-badge-icon">
+                        <svg viewBox="0 0 36 36" width="34" height="34">
+                          <polygon points="18,3 31,10 31,26 18,33 5,26 5,10" fill="#cbd5e1" stroke="#1e293b" stroke-width="2.5"/>
+                          <line x1="18" y1="3" x2="18" y2="33" stroke="#94a3b8" stroke-width="1.5"/>
+                          <line x1="5" y1="18" x2="31" y2="18" stroke="#94a3b8" stroke-width="1.5"/>
+                        </svg>
+                      </div>
+                      <span class="tc-badge-code">G1</span>
+                    </div>
+
+                    <!-- G2 Johto -->
+                    <div class="tc-badge-item" data-gen="2" data-region="Johto" data-total="100" onmouseenter="hoverBadge(2, 'Johto', 100)" onmouseleave="resetBadgeHover()" onclick="openBinderRegion(2)">
+                      <div class="tc-badge-icon">
+                        <svg viewBox="0 0 36 36" width="34" height="34">
+                          <circle cx="18" cy="18" r="14" fill="#38bdf8" stroke="#1e293b" stroke-width="2.5"/>
+                          <circle cx="18" cy="18" r="6.5" fill="#bae6fd" stroke="#0284c7" stroke-width="2"/>
+                        </svg>
+                      </div>
+                      <span class="tc-badge-code">G2</span>
+                    </div>
+
+                    <!-- G3 Hoenn -->
+                    <div class="tc-badge-item" data-gen="3" data-region="Hoenn" data-total="135" onmouseenter="hoverBadge(3, 'Hoenn', 135)" onmouseleave="resetBadgeHover()" onclick="openBinderRegion(3)">
+                      <div class="tc-badge-icon">
+                        <svg viewBox="0 0 36 36" width="34" height="34">
+                          <rect x="5" y="5" width="26" height="26" rx="4" fill="#f97316" stroke="#1e293b" stroke-width="2.5"/>
+                          <rect x="11" y="11" width="14" height="14" rx="2" fill="#ea580c"/>
+                        </svg>
+                      </div>
+                      <span class="tc-badge-code">G3</span>
+                    </div>
+
+                    <!-- G4 Sinnoh -->
+                    <div class="tc-badge-item" data-gen="4" data-region="Sinnoh" data-total="107" onmouseenter="hoverBadge(4, 'Sinnoh', 107)" onmouseleave="resetBadgeHover()" onclick="openBinderRegion(4)">
+                      <div class="tc-badge-icon">
+                        <svg viewBox="0 0 36 36" width="34" height="34">
+                          <polygon points="18,4 32,18 18,32 4,18" fill="#18181b" stroke="#1e293b" stroke-width="2.5"/>
+                          <polygon points="18,10 26,18 18,26 10,18" fill="#ef4444"/>
+                        </svg>
+                      </div>
+                      <span class="tc-badge-code">G4</span>
+                    </div>
+
+                    <!-- G5 Unova -->
+                    <div class="tc-badge-item" data-gen="5" data-region="Unova" data-total="156" onmouseenter="hoverBadge(5, 'Unova', 156)" onmouseleave="resetBadgeHover()" onclick="openBinderRegion(5)">
+                      <div class="tc-badge-icon">
+                        <svg viewBox="0 0 36 36" width="34" height="34">
+                          <polygon points="18,4 32,30 4,30" fill="#facc15" stroke="#1e293b" stroke-width="2.5"/>
+                          <circle cx="18" cy="21" r="4.5" fill="#22c55e"/>
+                        </svg>
+                      </div>
+                      <span class="tc-badge-code">G5</span>
+                    </div>
+
+                    <!-- G6 Kalos -->
+                    <div class="tc-badge-item" data-gen="6" data-region="Kalos" data-total="72" onmouseenter="hoverBadge(6, 'Kalos', 72)" onmouseleave="resetBadgeHover()" onclick="openBinderRegion(6)">
+                      <div class="tc-badge-icon">
+                        <svg viewBox="0 0 36 36" width="34" height="34">
+                          <polygon points="18,4 32,14 27,31 9,31 4,14" fill="#84cc16" stroke="#1e293b" stroke-width="2.5"/>
+                          <polygon points="18,11 25,18 22,26 14,26 11,18" fill="#fef08a"/>
+                        </svg>
+                      </div>
+                      <span class="tc-badge-code">G6</span>
+                    </div>
+
+                    <!-- G7 Alola -->
+                    <div class="tc-badge-item" data-gen="7" data-region="Alola" data-total="88" onmouseenter="hoverBadge(7, 'Alola', 88)" onmouseleave="resetBadgeHover()" onclick="openBinderRegion(7)">
+                      <div class="tc-badge-icon">
+                        <svg viewBox="0 0 36 36" width="34" height="34">
+                          <circle cx="18" cy="18" r="14" fill="#a855f7" stroke="#1e293b" stroke-width="2.5"/>
+                          <polygon points="18,7 23,18 18,29 13,18" fill="#facc15"/>
+                        </svg>
+                      </div>
+                      <span class="tc-badge-code">G7</span>
+                    </div>
+
+                    <!-- G8 Galar -->
+                    <div class="tc-badge-item" data-gen="8" data-region="Galar" data-total="96" onmouseenter="hoverBadge(8, 'Galar', 96)" onmouseleave="resetBadgeHover()" onclick="openBinderRegion(8)">
+                      <div class="tc-badge-icon">
+                        <svg viewBox="0 0 36 36" width="34" height="34">
+                          <ellipse cx="18" cy="18" rx="14" ry="12" fill="#22c55e" stroke="#1e293b" stroke-width="2.5"/>
+                          <circle cx="18" cy="18" r="5.5" fill="#15803d"/>
+                        </svg>
+                      </div>
+                      <span class="tc-badge-code">G8</span>
+                    </div>
+
+                    <!-- G9 Paldea -->
+                    <div class="tc-badge-item" data-gen="9" data-region="Paldea" data-total="120" onmouseenter="hoverBadge(9, 'Paldea', 120)" onmouseleave="resetBadgeHover()" onclick="openBinderRegion(9)">
+                      <div class="tc-badge-icon">
+                        <svg viewBox="0 0 36 36" width="34" height="34">
+                          <polygon points="18,4 30,11 30,25 18,32 6,25 6,11" fill="#ec4899" stroke="#1e293b" stroke-width="2.5"/>
+                          <circle cx="18" cy="18" r="6" fill="#06b6d4"/>
+                        </svg>
+                      </div>
+                      <span class="tc-badge-code">G9</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <button class="btn btn-outline btn-sm" onclick="loadDashboard()">↻ Refresh</button>
+
+          <!-- ── Binders Collection Showcase ── -->
+          <div class="home-binders-showcase">
+            <div class="home-binders-header">
+              <div>
+                <h2 class="home-binders-title">📦 My Pokémon Binders</h2>
+                <p class="home-binders-sub">Select a binder to open, browse cards, or track sets.</p>
+              </div>
+              <button class="btn btn-gold btn-sm" onclick="openBinderModal()">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                New Binder
+              </button>
+            </div>
+
+            <!-- Grid of Binder Cards -->
+            <div id="homeBindersGrid" class="home-binders-grid">
+              <!-- Dynamically populated by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ BINDER / NATIONAL POKÉDEX VIEW ══════════════════════════════════ -->
+      <div id="binderPage" class="hidden">
+        <!-- Pokédex Search & Filter Panel (White Card) -->
+        <section class="pokedex-panel">
+          <div class="pokedex-header">
+            <div class="pokedex-title-group">
+              <h1 class="pokedex-title">National Pokédex (1–1,025)</h1>
+              <p class="pokedex-subtitle">Tap any Pokémon to view all of their cards and track your collection.</p>
+            </div>
+
+            <!-- 3 Summary Indicator Badges (Green, Yellow, Red) -->
+            <div class="pokedex-summary-boxes">
+              <div class="summary-box summary-green">
+                <span class="summary-label">COLLECTED</span>
+                <span class="summary-value" id="statCollected">0</span>
+              </div>
+              <div class="summary-box summary-yellow">
+                <span class="summary-label">REMAINING</span>
+                <span class="summary-value" id="statRemaining">1,025</span>
+              </div>
+              <div class="summary-box summary-red">
+                <span class="summary-label">COMPLETION</span>
+                <span class="summary-value" id="statCompletion">0.0%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Search Input Bar -->
+          <div class="pokedex-search-bar">
+            <div class="search-input-wrapper">
+              <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8" stroke-width="2"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65" stroke-width="2"></line>
+              </svg>
+              <input type="text" id="pokedexSearchInput" class="pokedex-search-input" 
+                placeholder="Search by Pokémon name, No. (0001), or set name..." 
+                oninput="handlePokedexSearch(this.value)" />
+              <button class="search-clear-btn hidden" id="searchClearBtn" onclick="clearSearchInput()" title="Clear search">✕</button>
+            </div>
+          </div>
+
+          <!-- Filter Rows (Pill-shaped buttons) -->
+          <div class="pokedex-filters-container">
+            <!-- Row 1: Generation Filters -->
+            <div class="filter-row filter-row-gens">
+              <div class="filter-row-label">GENERATION:</div>
+              <div class="filter-pills-wrap" id="genFilterPills">
+                <button class="pill-btn active" data-gen="all" onclick="selectGenFilter('all')">ALL</button>
+                <button class="pill-btn" data-gen="1" onclick="selectGenFilter(1)">GEN I (KANTO)</button>
+                <button class="pill-btn" data-gen="2" onclick="selectGenFilter(2)">GEN II (JOHTO)</button>
+                <button class="pill-btn" data-gen="3" onclick="selectGenFilter(3)">GEN III (HOENN)</button>
+                <button class="pill-btn" data-gen="4" onclick="selectGenFilter(4)">GEN IV (SINNOH)</button>
+                <button class="pill-btn" data-gen="5" onclick="selectGenFilter(5)">GEN V (UNOVA)</button>
+                <button class="pill-btn" data-gen="6" onclick="selectGenFilter(6)">GEN VI (KALOS)</button>
+                <button class="pill-btn" data-gen="7" onclick="selectGenFilter(7)">GEN VII (ALOLA)</button>
+                <button class="pill-btn" data-gen="8" onclick="selectGenFilter(8)">GEN VIII (GALAR)</button>
+                <button class="pill-btn" data-gen="9" onclick="selectGenFilter(9)">GEN IX (PALDEA)</button>
+              </div>
+            </div>
+
+            <!-- Row 2: Collection Status & Type Filters -->
+            <div class="filter-row filter-row-types">
+              <div class="filter-status-group">
+                <div class="filter-row-label">STATUS:</div>
+                <div class="filter-pills-wrap" id="statusFilterPills">
+                  <button class="pill-btn active" data-status="all" onclick="selectStatusFilter('all')">ALL</button>
+                  <button class="pill-btn" data-status="collected" onclick="selectStatusFilter('collected')">COLLECTED</button>
+                  <button class="pill-btn" data-status="missing" onclick="selectStatusFilter('missing')">MISSING</button>
+                </div>
+              </div>
+
+              <div class="filter-types-group">
+                <div class="filter-row-label">TYPE:</div>
+                <div class="filter-pills-wrap" id="typeFilterPills">
+                  <button class="pill-btn active" data-type="all" onclick="selectTypeFilter('all')">ALL</button>
+                  <button class="pill-btn" data-type="Normal" onclick="selectTypeFilter('Normal')">NORMAL</button>
+                  <button class="pill-btn" data-type="Fire" onclick="selectTypeFilter('Fire')">FIRE</button>
+                  <button class="pill-btn" data-type="Water" onclick="selectTypeFilter('Water')">WATER</button>
+                  <button class="pill-btn" data-type="Grass" onclick="selectTypeFilter('Grass')">GRASS</button>
+                  <button class="pill-btn" data-type="Electric" onclick="selectTypeFilter('Electric')">ELECTRIC</button>
+                  <button class="pill-btn" data-type="Ice" onclick="selectTypeFilter('Ice')">ICE</button>
+                  <button class="pill-btn" data-type="Fighting" onclick="selectTypeFilter('Fighting')">FIGHTING</button>
+                  <button class="pill-btn" data-type="Poison" onclick="selectTypeFilter('Poison')">POISON</button>
+                  <button class="pill-btn" data-type="Ground" onclick="selectTypeFilter('Ground')">GROUND</button>
+                  <button class="pill-btn" data-type="Flying" onclick="selectTypeFilter('Flying')">FLYING</button>
+                  <button class="pill-btn" data-type="Psychic" onclick="selectTypeFilter('Psychic')">PSYCHIC</button>
+                  <button class="pill-btn" data-type="Bug" onclick="selectTypeFilter('Bug')">BUG</button>
+                  <button class="pill-btn" data-type="Rock" onclick="selectTypeFilter('Rock')">ROCK</button>
+                  <button class="pill-btn" data-type="Ghost" onclick="selectTypeFilter('Ghost')">GHOST</button>
+                  <button class="pill-btn" data-type="Dragon" onclick="selectTypeFilter('Dragon')">DRAGON</button>
+                  <button class="pill-btn" data-type="Steel" onclick="selectTypeFilter('Steel')">STEEL</button>
+                  <button class="pill-btn" data-type="Fairy" onclick="selectTypeFilter('Fairy')">FAIRY</button>
+                  <button class="pill-btn" data-type="Dark" onclick="selectTypeFilter('Dark')">DARK</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Sub-header bar between Search Panel and Binder -->
+        <div class="binder-subbar">
+          <div class="subbar-left">
+            <span id="showingCountText">SHOWING 1–16 OF 1,025 POKÉMON</span>
+            <span class="subbar-divider">|</span>
+            <span>PAGE COMPLETION: <strong id="pageCompletionRate" class="completion-pill">0.0%</strong></span>
+          </div>
+          <div class="subbar-right">
+            <span class="binder-format-label">BINDER FORMAT: <strong>4×4 (16 / PAGE)</strong></span>
+            <span class="subbar-hint">Tap a card to view details</span>
+          </div>
+        </div>
+
+        <!-- Dark Binder Container -->
+        <section class="binder-dark-container">
+          <!-- Binder Header with Page Info & Navigation -->
+          <div class="binder-header-row">
+            <div class="binder-title-info">
+              <div class="binder-category-wrap">
+                <span class="binder-category" id="binderCategoryLabel">ALL POKÉMON | MASTER PORTFOLIO</span>
+                <select id="binderSelectDropdown" class="binder-switcher-select" onchange="selectBinder(parseInt(this.value))" title="Switch Binder">
+                  <!-- Populated by JS -->
+                </select>
+              </div>
+              <h2 class="binder-page-title" id="binderPageTitle">Binder Page 1</h2>
+            </div>
+
+            <!-- Page Navigation Controls -->
+            <div class="binder-nav-controls">
+              <button class="binder-nav-btn" id="btnPrevPage" onclick="changeBinderPage(-1)" title="Previous Page">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                Prev
+              </button>
+              <div class="binder-page-indicator">
+                <span id="curPageNum">1</span> / <span id="totalPageNum">65</span>
+              </div>
+              <button class="binder-nav-btn" id="btnNextPage" onclick="changeBinderPage(1)" title="Next Page">
+                Next
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- 4-Column Pokémon Card Grid -->
+          <div id="cardContainer" class="pokemon-card-grid">
+            <!-- Dynamically populated by JS -->
+          </div>
+
+          <!-- Empty state within binder -->
+          <div id="binderEmptyState" class="empty-state hidden">
+            <div class="empty-graphic">🔍</div>
+            <h3 class="empty-title">No Pokémon Found</h3>
+            <p class="empty-desc">No Pokémon match the selected filters. Try resetting your search or filter pills.</p>
+            <button class="btn btn-gold btn-sm" onclick="resetAllFilters()">Reset Filters</button>
+          </div>
+        </section>
+      </div>
+
+      <!-- ═══ DASHBOARD PAGE ═════════════════════════════════════════════════ -->
+      <div id="dashboardPage" class="page-section hidden">
+        <div class="section-title-bar">
+          <div>
+            <h1 class="section-main-title">📊 Collection Dashboard</h1>
+            <p class="section-subtitle">Your collection statistics and analytics at a glance</p>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="loadDashboard()">↻ Refresh Stats</button>
         </div>
 
         <div class="dash-stats-grid" id="dashStatsGrid">
@@ -130,7 +465,7 @@
 
         <div class="charts-grid">
           <div class="chart-card">
-            <h3 class="chart-title">🔥 Cards by Type</h3>
+            <h3 class="chart-title">🔥 Cards by Pokémon Type</h3>
             <div class="chart-wrapper"><canvas id="typeChart"></canvas></div>
           </div>
           <div class="chart-card">
@@ -146,24 +481,24 @@
 
         <div class="dash-bottom-grid">
           <div class="panel-card">
-            <h3 class="panel-title">🕐 Recently Added</h3>
+            <h3 class="panel-title">🕐 Recently Added Cards</h3>
             <div id="recentCardsList" class="recent-cards-list"></div>
           </div>
           <div class="panel-card">
-            <h3 class="panel-title">✨ Highlights</h3>
+            <h3 class="panel-title">✨ Collection Highlights</h3>
             <div id="dashHighlights" class="highlights-list"></div>
           </div>
         </div>
       </div>
 
       <!-- ═══ FAVORITES PAGE ════════════════════════════════════════════════ -->
-      <div id="favoritesPage" class="page hidden">
-        <div class="page-header">
+      <div id="favoritesPage" class="page-section hidden">
+        <div class="section-title-bar">
           <div>
-            <h1 class="page-title">❤️ Favorites</h1>
-            <p class="page-subtitle" id="favSubtitle">Your most loved cards</p>
+            <h1 class="section-main-title">❤️ Favorites Collection</h1>
+            <p class="section-subtitle" id="favSubtitle">Your most treasured Pokémon cards</p>
           </div>
-          <div class="page-header-actions">
+          <div class="section-actions">
             <div class="view-toggle">
               <button class="view-btn active" id="viewGrid" onclick="setFavView('grid')" title="Grid view">
                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg>
@@ -172,7 +507,7 @@
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
               </button>
             </div>
-            <select class="input-text input-sm" id="favSort" onchange="setFavSort(this.value)">
+            <select class="input-select input-sm" id="favSort" onchange="setFavSort(this.value)">
               <option value="date_desc">Newest First</option>
               <option value="date_asc">Oldest First</option>
               <option value="name_asc">Name A–Z</option>
@@ -183,40 +518,39 @@
 
         <!-- Highlights strip -->
         <div id="favHighlights" class="fav-highlights"></div>
-
         <div id="favGrid" class="fav-grid"></div>
         <div id="favEmpty" class="empty-state hidden">
           <div class="empty-graphic">🤍</div>
           <h2 class="empty-title">No Favorites Yet</h2>
-          <p class="empty-desc">Open any card and tap the heart to add it to your favorites.</p>
+          <p class="empty-desc">Open any card in your collection and tap the heart to add it to your favorites.</p>
         </div>
       </div>
 
       <!-- ═══ SETS PAGE ══════════════════════════════════════════════════════ -->
-      <div id="setsPage" class="page hidden">
-        <div class="page-header">
+      <div id="setsPage" class="page-section hidden">
+        <div class="section-title-bar">
           <div>
-            <h1 class="page-title">🏅 Set Progress</h1>
-            <p class="page-subtitle">Track your completion across every set</p>
+            <h1 class="section-main-title">🏅 Card Sets & Expansions</h1>
+            <p class="section-subtitle">Track your completion progress across every card expansion</p>
           </div>
+          <button class="btn btn-gold btn-sm" onclick="openAddSetModal()">+ Add New Set</button>
         </div>
 
         <div class="sets-controls">
-          <div class="search-input-group" style="flex:1">
-            <svg class="search-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" id="setSearchInput" class="search-field" placeholder="Search sets..." oninput="filterSets(this.value)">
+          <div class="search-input-wrapper" style="flex:1">
+            <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke-width="2"></circle><line x1="21" y1="21" x2="16.65" y2="16.65" stroke-width="2"></line></svg>
+            <input type="text" id="setSearchInput" class="pokedex-search-input" placeholder="Search sets and expansions..." oninput="filterSets(this.value)">
           </div>
-          <select class="input-text input-sm" id="setSort" onchange="sortSetsBy(this.value)">
+          <select class="input-select input-sm" id="setSort" onchange="sortSetsBy(this.value)">
             <option value="pct_desc">Completion ↓</option>
             <option value="pct_asc">Completion ↑</option>
             <option value="name_asc">Name A–Z</option>
             <option value="collected_desc">Most Cards</option>
           </select>
           <div class="sets-filter-btns">
-            <button class="btn btn-outline btn-sm" onclick="filterSetsByStatus('all')" id="setFilterAll">All</button>
-            <button class="btn btn-outline btn-sm" onclick="filterSetsByStatus('complete')" id="setFilterComplete">Completed ✓</button>
-            <button class="btn btn-outline btn-sm" onclick="filterSetsByStatus('incomplete')" id="setFilterIncomplete">In Progress</button>
-            <button class="btn btn-gold btn-sm" onclick="openAddSetModal()">+ Add Set</button>
+            <button class="pill-btn active" onclick="filterSetsByStatus('all')" id="setFilterAll">All</button>
+            <button class="pill-btn" onclick="filterSetsByStatus('complete')" id="setFilterComplete">Completed ✓</button>
+            <button class="pill-btn" onclick="filterSetsByStatus('incomplete')" id="setFilterIncomplete">In Progress</button>
           </div>
         </div>
 
@@ -224,28 +558,34 @@
         <div id="setsEmpty" class="empty-state hidden">
           <div class="empty-graphic">🏅</div>
           <h2 class="empty-title">No Sets Tracked</h2>
-          <p class="empty-desc">When adding cards, fill in the Set Name and Set Total Cards fields to start tracking progress.</p>
+          <p class="empty-desc">When adding cards, select or enter a Set Name to start tracking set completion.</p>
         </div>
       </div>
 
-    </div><!-- .content-area -->
+    </div><!-- .main-content-wrapper -->
   </main>
+
+  <!-- ─── Floating Action Button (Scroll to top) ────────────────────────────── -->
+  <button class="floating-action-btn" id="fabScrollTop" onclick="scrollToTop()" title="Scroll to top" aria-label="Scroll to top">
+    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>
+  </button>
 </div>
 
-<!-- ─── Binder Modal ─────────────────────────────────────────────────────── -->
+<!-- ─── Binder Settings / Create Modal ───────────────────────────────────── -->
 <div id="binderModalBackdrop" class="modal-backdrop" onclick="closeModals()">
   <div class="modal" onclick="event.stopPropagation()">
+    <button class="modal-x-btn" onclick="closeModals()" aria-label="Close">✕</button>
     <h2 id="binderModalTitle" class="modal-title">New Binder</h2>
 
     <div class="form-row">
-      <label class="form-label">Name</label>
-      <input type="text" id="bm_name" class="input-text" placeholder="e.g. Base Set 1999" maxlength="120">
+      <label class="form-label">Binder Name</label>
+      <input type="text" id="bm_name" class="input-text" placeholder="e.g. Master Portfolio 1–1025" maxlength="120">
     </div>
 
     <div class="form-row">
       <label class="form-label">Pocket Layout</label>
       <div class="gs-grid">
-        <div class="gs-btn active" id="gs2" onclick="selectGS(2)">
+        <div class="gs-btn" id="gs2" onclick="selectGS(2)">
           <div class="gs-mini" style="grid-template-columns: repeat(2, 1fr)"><div></div><div></div><div></div><div></div></div>
           <span>4-Pocket</span>
         </div>
@@ -253,24 +593,24 @@
           <div class="gs-mini" style="grid-template-columns: repeat(3, 1fr)"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
           <span>9-Pocket</span>
         </div>
-        <div class="gs-btn" id="gs4" onclick="selectGS(4)">
+        <div class="gs-btn active" id="gs4" onclick="selectGS(4)">
           <div class="gs-mini" style="grid-template-columns: repeat(4, 1fr)"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
-          <span>16-Pocket</span>
+          <span>16-Pocket (4×4)</span>
         </div>
       </div>
     </div>
 
     <div class="form-row">
-      <label class="form-label">Total Pages (1-200)</label>
-      <input type="number" id="bm_pages" class="input-text" value="10" min="1" max="200">
+      <label class="form-label">Total Pages</label>
+      <input type="number" id="bm_pages" class="input-text" value="65" min="1" max="200">
     </div>
 
     <div class="form-row">
-      <label class="form-label">Binder Theme</label>
+      <label class="form-label">Theme Color</label>
       <div class="color-grid" id="bm_colors">
-        <div class="color-box active" style="background:#e63946" data-val="#e63946"></div>
+        <div class="color-box" style="background:#e63946" data-val="#e63946"></div>
         <div class="color-box" style="background:#3b4cca" data-val="#3b4cca"></div>
-        <div class="color-box" style="background:#ffcb05" data-val="#ffcb05"></div>
+        <div class="color-box active" style="background:#ffcb05" data-val="#ffcb05"></div>
         <div class="color-box" style="background:#2dc653" data-val="#2dc653"></div>
         <div class="color-box" style="background:#9b5de5" data-val="#9b5de5"></div>
         <div class="color-box" style="background:#f77f00" data-val="#f77f00"></div>
@@ -281,7 +621,7 @@
 
     <div class="modal-btns">
       <button class="btn btn-outline" onclick="closeModals()">Cancel</button>
-      <button class="btn btn-gold" id="btnSaveBinder" onclick="saveBinder()">Create Binder</button>
+      <button class="btn btn-gold" id="btnSaveBinder" onclick="saveBinder()">Save Binder</button>
     </div>
   </div>
 </div>
@@ -289,16 +629,17 @@
 <!-- ─── Add Set Modal ────────────────────────────────────────────────────── -->
 <div id="addSetModal" class="modal-backdrop" onclick="closeAddSetModal()">
   <div class="modal" onclick="event.stopPropagation()">
-    <h2 class="modal-title">New Set</h2>
+    <button class="modal-x-btn" onclick="closeAddSetModal()" aria-label="Close">✕</button>
+    <h2 class="modal-title">New Set / Expansion</h2>
 
     <div class="form-row">
       <label class="form-label">Set Name</label>
-      <input type="text" id="set_add_name" class="input-text" placeholder="e.g. Base Set" maxlength="120">
+      <input type="text" id="set_add_name" class="input-text" placeholder="e.g. Genetic Apex" maxlength="120">
     </div>
 
     <div class="form-row">
       <label class="form-label">Total Cards in Set</label>
-      <input type="number" id="set_add_total_cards" class="input-text" placeholder="e.g. 102" min="1">
+      <input type="number" id="set_add_total_cards" class="input-text" placeholder="e.g. 286" min="1">
     </div>
 
     <div class="modal-btns">
@@ -308,131 +649,237 @@
   </div>
 </div>
 
-<!-- ─── Card Upload Modal ────────────────────────────────────────────────── -->
+<!-- ─── Card Upload / Add Modal ──────────────────────────────────────────── -->
 <div id="cardModalBackdrop" class="modal-backdrop" onclick="closeModals()">
-  <div class="modal" onclick="event.stopPropagation()">
-    <h2 class="modal-title">New Card</h2>
+  <div class="card-add-modal" onclick="event.stopPropagation()">
+    <!-- Red circular close button -->
+    <button class="modal-x-btn-red" onclick="closeModals()" aria-label="Close" title="Close">✕</button>
 
-    <div class="form-row">
-      <label class="form-label">Card Name</label>
-      <input type="text" id="cm_name" class="input-text" placeholder="e.g. Charizard Holo" maxlength="120">
-    </div>
-
-    <div class="form-row">
-      <label class="form-label">Pokémon Type <span style="color:var(--red)">*</span></label>
-      <div class="type-grid" id="cm_types"></div>
-    </div>
-
-    <div class="form-row">
-      <label class="form-label">Rarity</label>
-      <select id="cm_rarity" class="input-text">
-        <option value="">— Select Rarity —</option>
-        <option>Common</option>
-        <option>Uncommon</option>
-        <option>Rare</option>
-        <option>Super Rare</option>
-        <option>Baby Shiny</option>
-        <option>Rare Shiny</option>
-        <option>Ilusration Rare(IR)</option>
-        <option>Special Art Rare (SAR)</option>
-        <option>Special Ilustration Art Rare</option>
-        <option>Gold</option>
-      </select>
-    </div>
-
-    <div class="form-row">
-      <label class="form-label">Card Artwork</label>
-      <div class="upload-zone" id="uploadZone">
-        <input type="file" id="cm_file" style="display:none" accept="image/*" onchange="previewImg(this)">
-        <div id="up_empty" style="text-align:center">
-          <p style="font-size:2rem;margin-bottom:0.5rem">🖼️</p>
-          <p style="font-size:0.875rem;color:var(--text-dim)">Click or drag to upload image</p>
+    <div class="card-add-layout">
+      <!-- Left: Interactive Live Card Preview -->
+      <div class="card-add-preview-panel">
+        <div class="card-add-preview-header">
+          <span class="card-add-preview-title">CARD PREVIEW</span>
+          <span class="card-add-live-pill">LIVE</span>
         </div>
-        <img id="up_preview" class="hidden" style="max-height:200px;border-radius:8px;margin:0 auto;display:block;" alt="Preview">
-      </div>
-    </div>
 
-    <div class="form-row">
-      <label class="form-label">Set Name</label>
-      <select id="cm_set_name" class="input-text" onchange="onSetSelectionChange('cm_set_name', 'cm_set_total')">
-        <option value="">— None —</option>
-      </select>
-    </div>
+        <div class="card-add-preview-card" id="cm_preview_card">
+          <div class="cm-prev-top">
+            <span class="cm-prev-dex" id="cm_prev_dex">No. 0017</span>
+            <div class="cm-prev-ball">
+              <svg viewBox="0 0 32 32" width="20" height="20">
+                <circle cx="16" cy="16" r="14" fill="#ffffff" stroke="#18181b" stroke-width="2.5"/>
+                <path d="M 2 16 A 14 14 0 0 1 30 16 Z" fill="#ef4444" stroke="#18181b" stroke-width="2.5"/>
+                <line x1="2" y1="16" x2="30" y2="16" stroke="#18181b" stroke-width="2.5"/>
+                <circle cx="16" cy="16" r="4.5" fill="#ffffff" stroke="#18181b" stroke-width="2.5"/>
+                <circle cx="16" cy="16" r="2" fill="#18181b"/>
+              </svg>
+            </div>
+          </div>
+          <div class="cm-prev-art-wrap">
+            <img id="cm_prev_art" class="cm-prev-art" src="" alt="Preview Artwork">
+          </div>
+          <div class="cm-prev-bottom">
+            <div class="cm-prev-name" id="cm_prev_name">Pidgeotto</div>
+            <div class="cm-prev-subrow">
+              <span class="cm-prev-type" id="cm_prev_type">NORMAL</span>
+              <span class="cm-prev-rarity" id="cm_prev_rarity">COMMON</span>
+            </div>
+          </div>
+        </div>
 
-    <div class="form-two-col">
-      <div class="form-row">
-        <label class="form-label">Card Number</label>
-        <input type="number" id="cm_card_number" class="input-text" placeholder="e.g. 1" min="1">
+        <div class="card-add-preview-hint">Official artwork used automatically if no custom card image is uploaded.</div>
       </div>
-      <div class="form-row">
-        <label class="form-label">Set Total Cards</label>
-        <input type="number" id="cm_set_total" class="input-text" placeholder="e.g. 165" min="1" readonly>
-      </div>
-    </div>
 
-    <div class="modal-btns">
-      <button class="btn btn-outline" onclick="closeModals()">Cancel</button>
-      <button class="btn btn-gold" id="btnSaveCard" onclick="saveCard()">Add to Collection</button>
+      <!-- Right: Form Controls -->
+      <div class="card-add-form-panel">
+        <div class="card-add-title-wrap">
+          <div class="card-add-tag-header">COLLECTION ARCHIVE</div>
+          <h2 class="card-add-modal-title" id="cardModalTitle">Add Pokémon Card</h2>
+        </div>
+
+        <div class="form-two-col">
+          <div class="form-row">
+            <label class="form-label">Card / Pokémon Name</label>
+            <input type="text" id="cm_name" class="input-text" placeholder="e.g. Pidgeotto" maxlength="120" oninput="updateLiveCardPreview()">
+          </div>
+          <div class="form-row">
+            <label class="form-label">Rarity</label>
+            <select id="cm_rarity" class="input-text" onchange="updateLiveCardPreview()">
+              <option value="">— Select Rarity —</option>
+              <option>Common</option>
+              <option>Uncommon</option>
+              <option>Rare</option>
+              <option>Super Rare</option>
+              <option>Baby Shiny</option>
+              <option>Rare Shiny</option>
+              <option>Ilusration Rare(IR)</option>
+              <option>Special Art Rare (SAR)</option>
+              <option>Special Ilustration Art Rare</option>
+              <option>Gold</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">Pokémon Type <span style="color:#ef4444">*</span></label>
+          <div class="type-grid" id="cm_types"></div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">Card Artwork <span class="form-label-opt">(Optional Custom Image)</span></label>
+          <div class="upload-zone-v2" id="uploadZone" onclick="document.getElementById('cm_file').click()">
+            <input type="file" id="cm_file" style="display:none" accept="image/*" onchange="previewImg(this)">
+            <div id="up_empty" class="up-empty-state">
+              <div class="up-empty-icon">🖼️</div>
+              <div class="up-empty-text">
+                <span class="up-upload-title">Choose custom TCG card file</span>
+                <span class="up-upload-sub">Click or drag & drop image here (PNG, JPG, WEBP)</span>
+              </div>
+            </div>
+            <div id="up_preview_wrap" class="up-preview-wrap hidden">
+              <img id="up_preview" class="up-preview-thumb" alt="Uploaded Preview">
+              <div class="up-preview-info">
+                <span id="up_preview_filename" class="up-file-name">custom_card.png</span>
+                <button type="button" class="btn-clear-upload" onclick="clearUploadedImg(event)">✕ Reset Artwork</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-two-col">
+          <div class="form-row">
+            <label class="form-label">Set Name</label>
+            <select id="cm_set_name" class="input-text" onchange="onSetSelectionChange('cm_set_name', 'cm_set_total')">
+              <option value="">— None —</option>
+            </select>
+          </div>
+          <div class="form-two-col" style="gap: 0.5rem;">
+            <div class="form-row">
+              <label class="form-label">Card #</label>
+              <input type="number" id="cm_card_number" class="input-text" placeholder="e.g. 17" min="1">
+            </div>
+            <div class="form-row">
+              <label class="form-label">Set Total</label>
+              <input type="number" id="cm_set_total" class="input-text" placeholder="e.g. 165" min="1" readonly>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-add-btns">
+          <button class="btn btn-outline" onclick="closeModals()">Cancel</button>
+          <button class="btn btn-gold" id="btnSaveCard" onclick="saveCard()">✨ Add to Collection</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ─── Card Detail Modal ────────────────────────────────────────────────── -->
+<!-- ─── Card Detail Modal (Image 3 Reference) ────────────────────────────── -->
 <div id="cardDetailBackdrop" class="modal-backdrop card-detail-backdrop" onclick="closeCardDetail()">
-  <div class="card-detail-modal" onclick="event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="cdm_name">
-    <button class="modal-x-btn" onclick="closeCardDetail()" aria-label="Close">✕</button>
+  <div class="card-detail-modal-v3" onclick="event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="cdm_name">
+    <!-- Red circular close button (Image 3) -->
+    <button class="cdm-close-btn-red" onclick="closeCardDetail()" aria-label="Close" title="Close">✕</button>
 
-    <div class="card-detail-layout">
-      <!-- Left: Image -->
-      <div class="card-detail-img-panel">
-        <div class="card-detail-img-wrapper">
-          <img id="cdm_image" class="card-detail-img" loading="lazy" alt="Card image">
+    <div class="card-detail-layout-v3">
+      <!-- Left Column: Dark Navy Showcase with Card Image & Nav Chevrons -->
+      <div class="cdm-left-showcase">
+        <!-- Prev Card Chevron -->
+        <button class="cdm-chevron-btn cdm-chevron-prev" id="cdm_prev_btn" onclick="navigateDetailCard(-1)" title="Previous card" aria-label="Previous card">
+          <svg width="20" height="20" fill="none" stroke="#18181b" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+
+        <div class="cdm-card-art-box">
+          <img id="cdm_image" class="cdm-card-full-img" loading="lazy" alt="Card image">
           <div id="cdm_fav_badge" class="cdm-fav-badge hidden">❤️</div>
         </div>
-        <div class="cdm-img-actions">
-          <button class="btn btn-gold btn-sm" id="cdm_fav_btn" onclick="toggleCardDetailFavorite()">
-            <span id="cdm_fav_icon">🤍</span> <span id="cdm_fav_text">Add Favorite</span>
-          </button>
-        </div>
+
+        <!-- Next Card Chevron -->
+        <button class="cdm-chevron-btn cdm-chevron-next" id="cdm_next_btn" onclick="navigateDetailCard(1)" title="Next card" aria-label="Next card">
+          <svg width="20" height="20" fill="none" stroke="#18181b" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        </button>
       </div>
 
-      <!-- Right: Info -->
-      <div class="card-detail-info-panel">
+      <!-- Right Column: Clean White Detail Panel (Image 3) -->
+      <div class="cdm-right-details">
         <!-- View Mode -->
         <div id="cdm_view_mode">
-          <div class="cdm-header">
-            <div class="cdm-type-badge" id="cdm_type_badge"></div>
-            <div class="cdm-rarity-badge" id="cdm_rarity_badge"></div>
-          </div>
-          <h2 class="cdm-name" id="cdm_name"></h2>
-
-          <div class="cdm-meta-grid">
-            <div class="cdm-meta-item">
-              <span class="cdm-meta-label">Set</span>
-              <span class="cdm-meta-value" id="cdm_set">—</span>
-            </div>
-            <div class="cdm-meta-item">
-              <span class="cdm-meta-label">Card #</span>
-              <span class="cdm-meta-value" id="cdm_card_number">—</span>
-            </div>
-            <div class="cdm-meta-item">
-              <span class="cdm-meta-label">Binder</span>
-              <span class="cdm-meta-value" id="cdm_binder">—</span>
-            </div>
-            <div class="cdm-meta-item">
-              <span class="cdm-meta-label">Added</span>
-              <span class="cdm-meta-value" id="cdm_date">—</span>
-            </div>
+          <!-- Breadcrumb (BINDER / GEN 1 KANTO / PAGE 1) -->
+          <div class="cdm-breadcrumbs" id="cdm_breadcrumbs">
+            BINDER &nbsp;/&nbsp; GEN 1 KANTO &nbsp;/&nbsp; PAGE 1
           </div>
 
-          <div class="cdm-notes-section">
-            <div class="cdm-meta-label">Notes</div>
-            <div class="cdm-notes-text" id="cdm_notes_text">No notes added.</div>
+          <!-- Title: Name + Red No.0001 -->
+          <div class="cdm-title-row">
+            <h2 class="cdm-main-title" id="cdm_name">Bulbasaur</h2>
+            <span class="cdm-title-num-red" id="cdm_title_num">No.0001</span>
+          </div>
+
+          <!-- Subtitle: Bulbasaur (IR) -->
+          <div class="cdm-subtitle-text" id="cdm_subtitle">Bulbasaur (IR)</div>
+
+          <!-- Badges: [ILLUSTRATION RARE] [✓ COLLECTED] -->
+          <div class="cdm-badges-row">
+            <span class="cdm-badge-teal" id="cdm_rarity_pill">ILLUSTRATION RARE</span>
+            <span class="cdm-badge-green" id="cdm_status_pill">✓ COLLECTED</span>
+            <button class="cdm-fav-toggle-btn" id="cdm_fav_btn" onclick="toggleCardDetailFavorite()" title="Toggle Favorite">
+              <span id="cdm_fav_icon">🤍</span>
+            </button>
+          </div>
+
+          <!-- Specs Table (Image 3 format) -->
+          <div class="cdm-specs-table">
+            <div class="cdm-table-row">
+              <span class="cdm-table-label">SET NAME</span>
+              <span class="cdm-table-val font-pixel" id="cdm_set">Stellar Crown</span>
+            </div>
+            <div class="cdm-table-row">
+              <span class="cdm-table-label">RARITY</span>
+              <span class="cdm-table-val font-pixel text-red" id="cdm_rarity">IR</span>
+            </div>
+            <div class="cdm-table-row">
+              <span class="cdm-table-label">CARD NUMBER</span>
+              <span class="cdm-table-val font-pixel" id="cdm_card_number">#143/142</span>
+            </div>
+            <div class="cdm-table-row">
+              <span class="cdm-table-label">REGION</span>
+              <span class="cdm-table-val font-pixel" id="cdm_region">Gen 1 (Kanto)</span>
+            </div>
+            <div class="cdm-table-row">
+              <span class="cdm-table-label">DATE ADDED</span>
+              <span class="cdm-table-val font-pixel" id="cdm_date">10/22/2026</span>
+            </div>
+          </div>
+
+          <!-- Notes / Quote Box -->
+          <div class="cdm-quote-box" id="cdm_notes_text">
+            Pulled in IR Pokédex Episode 209 after 40 packs. IR from Stellar Crown.
+          </div>
+
+          <!-- Action Buttons (Replacing "WATCH THE PULL" with Edit and Delete) -->
+          <div class="cdm-actions-v3">
+            <div class="cdm-btn-edit-del-row">
+              <button class="cdm-action-btn btn-edit-card" onclick="toggleCardDetailEdit()">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                EDIT CARD
+              </button>
+              <button class="cdm-action-btn btn-delete-card" onclick="deleteDetailCard(this)" title="Delete this card from your collection">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                DELETE CARD
+              </button>
+            </div>
+
+            <!-- Jump to Page Button (Image 3) -->
+            <button class="cdm-jump-page-btn" id="cdm_jump_btn" onclick="jumpToCurrentCardPage()">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+              <span id="cdm_jump_btn_text">JUMP TO PG 1</span>
+            </button>
           </div>
         </div>
 
-        <!-- Edit Mode (hidden by default) -->
+        <!-- Edit Mode (preserved, switches in place) -->
         <div id="cdm_edit_mode" class="hidden">
+          <h3 style="font-size:1.15rem;font-weight:800;margin-bottom:1rem;color:#0f172a">✏️ Edit Card Information</h3>
           <div class="form-row">
             <label class="form-label">Card Name</label>
             <input type="text" id="cdm_edit_name" class="input-text" maxlength="120">
@@ -477,14 +924,13 @@
             <label class="form-label">Notes</label>
             <textarea id="cdm_edit_notes" class="input-text" rows="3" style="resize:vertical" placeholder="Personal notes about this card..."></textarea>
           </div>
-        </div>
-
-        <!-- Actions -->
-        <div class="cdm-actions">
-          <button class="btn btn-outline btn-sm" id="cdm_edit_toggle_btn" onclick="toggleCardDetailEdit()">✏️ Edit</button>
-          <button class="btn btn-gold btn-sm hidden" id="cdm_save_btn" onclick="saveCardEdit()">💾 Save</button>
-          <button class="btn btn-outline btn-sm hidden" id="cdm_cancel_btn" onclick="cancelCardEdit()">✕ Cancel</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteDetailCard()">🗑️ Delete</button>
+          <div class="cdm-actions" style="margin-top:1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn btn-gold btn-sm" id="cdm_save_btn" onclick="saveCardEdit()">💾 Save Changes</button>
+              <button class="btn btn-outline btn-sm" id="cdm_cancel_btn" onclick="cancelCardEdit()">✕ Cancel</button>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="deleteDetailCard(this)">🗑️ Delete Card</button>
+          </div>
         </div>
       </div>
     </div>
@@ -493,6 +939,8 @@
 
 <div id="toast"></div>
 
+<!-- Load Pokédex Data and Main App Scripts -->
+<script src="pokedex_data.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
