@@ -1,6 +1,6 @@
 <div align="center">
 
-  <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png" width="90" height="90" alt="PokéBinder Master Ball" />
+  <img src="frontend/assets/logo_binder.jpg" width="180" height="180" style="border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);" alt="PokéBinder Logo" />
 
   # ⚡ POKÉBINDER ⚡
   ### The Ultimate National Pokédex Portfolio & 3D Interactive TCG Card Binder

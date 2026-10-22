@@ -112,16 +112,20 @@ body {
   transform: rotate(-18deg) scale(1.1);
 }
 
-.modern-pokeball-svg {
+.nav-brand-img {
   width: 38px;
   height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid #ffd400;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
   display: block;
-  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.28));
-  transition: filter 0.25s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.nav-brand:hover .modern-pokeball-svg {
-  filter: drop-shadow(0 4px 10px rgba(230, 0, 35, 0.45));
+.nav-brand:hover .nav-brand-img {
+  transform: rotate(-10deg) scale(1.1);
+  box-shadow: 0 4px 12px rgba(255, 212, 0, 0.5);
 }
 
 .brand-text {
