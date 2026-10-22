@@ -3093,6 +3093,16 @@ body {
   background: #e2e8f0;
 }
 
+.cdm-fav-toggle-btn.active {
+  background: #ffe4e6;
+  border-color: #fda4af;
+  box-shadow: 0 2px 6px rgba(244, 63, 94, 0.25);
+}
+
+.cdm-fav-badge {
+  display: none !important;
+}
+
 /* Specs Table (Image 3 format) */
 .cdm-specs-table {
   border: 2px solid #18181b;
@@ -3486,7 +3496,7 @@ body {
 .tc-avatar-box {
   width: 72px;
   height: 72px;
-  background: #78c850;
+  background: #ffcb05;
   border: 3px solid #18181b;
   border-radius: 12px;
   display: flex;
@@ -3495,12 +3505,62 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
   flex-shrink: 0;
   overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.tc-avatar-box:hover {
+  transform: scale(1.06);
+  border-color: #E60023;
+  box-shadow: 0 8px 18px rgba(230, 0, 35, 0.25);
+}
+
+.tc-avatar-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.tc-avatar-box:hover .tc-avatar-overlay {
+  opacity: 1;
 }
 
 .tc-avatar-img {
   width: 64px;
   height: 64px;
   object-fit: contain;
+  transition: transform 0.2s ease;
+}
+
+.tc-avatar-box:hover .tc-avatar-img {
+  transform: scale(0.92);
+}
+
+.partner-color-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 2px solid #18181b;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.partner-color-btn:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.partner-color-btn.active {
+  outline: 2.5px solid #E60023;
+  outline-offset: 2px;
 }
 
 /* Stats Table */
