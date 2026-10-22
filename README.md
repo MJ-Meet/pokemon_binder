@@ -4,18 +4,20 @@ A premium, full-stack web application for Pokémon Card collectors to digitize, 
 
 ## ✨ Features
 
-- **Binders & Pages**: Organize cards in customizable 4, 9, or 16-pocket grids across up to 200 pages per binder with 8 theme colors.
+- **1,025 National Pokédex Support**: Full coverage from Bulbasaur (#0001) to Pecharunt (#1025) backed by a structured Pokédex dataset and official PokeAPI high-res artwork.
+- **Interactive 3D Card Flip**: Authentic 3D card flips with CSS `transform-style: preserve-3d` and smooth `rotateY(180deg)` animations, realistic card backs, and quick-add actions for missing slots.
+- **Card Detail Showcase Modal**: TCG-inspired detail showcase featuring high-res artwork, full specs table (Set, Rarity, Card #, Region, Date Added), inline notes, jump-to-page navigation, and edit/delete tools.
+- **Card Studio & Live Preview**: Two-column card upload studio featuring real-time card preview (dynamic type badge, rarity text, official/custom artwork, dex ID) and animated type pills.
+- **Trainer Card & Regional Gym Badges**: Interactive trainer passport tracking collection percentages across all 9 Pokémon regions (Kanto through Paldea) with aligned badges.
+- **Multi-Binder Architecture**: Manage multiple binders independently with custom theme colors, pocket layouts (4, 9, or 16-pocket grids), and live card counts.
 - **Card Images in Database**: Images are stored directly in PostgreSQL (`BYTEA`), meaning no broken links or missing files when migrating!
-- **Glassmorphism UI**: High-end translucent panels, CSS grid layouts, and a responsive sidebar.
-- **Holographic Shimmer**: Realistic, CSS-only holographic glares that dynamically shift when you hover over cards.
-- **Pokémon Type System**: Every card requires one of 10 core types — *Fire, Water, Grass, Electric, Psychic, Fighting, Dark, Steel, Dragon,* or *Colorless* — each with a distinct color and icon.
+- **Holographic Shimmer & Glassmorphism**: High-end translucent panels, CSS grid layouts, and realistic holographic glares that dynamically shift when hovering over cards.
+- **Pokémon Type System**: Full support for 10 core types — *Fire, Water, Grass, Electric, Psychic, Fighting, Dark, Steel, Dragon,* and *Colorless* — with type colors, icons, and glow effects.
 - **Rarity Tiers**: Classify cards across 10 rarity levels — from *Common* up to *Gold*, including TCG-specific tiers like *Baby Shiny*, *Special Art Rare (SAR)*, and *Special Illustration Art Rare*.
-- **Advanced Filtering & Search**: Filter cards by name, Pokémon type, rarity, set name, favorites-only, and recently added (7-day window). Active filters display as removable chips.
-- **Interactive Dashboard**: Rich stats panel with Chart.js visualizations (Type distribution doughnut, Rarity breakdown, Collection Growth over time), collection highlights, slot fill-rate, and a recently-added feed.
-- **Favorites Management**: A dedicated page to showcase favorited cards with Grid/List views, sorting (Newest, Oldest, Name A–Z, By Rarity), and quick highlight strips.
-- **Explicit Set Management**: Create and manage card sets independently via a dedicated modal. Sets persist even without cards, making it easy to plan ahead.
-- **Set Completion Progress**: A dedicated Sets page showing all managed sets with card counts, completion progress bars, search, sorting (by completion %, name, card count), and status filters (All / Completed / In Progress).
-- **Detailed Card View & Inline Editing**: Click any card to view detailed metadata (type, rarity, set, card number, binder, date added), write custom notes, toggle favorite status, or edit all fields in-line.
+- **Advanced Filtering & Search**: Filter cards by name, Pokémon type, rarity, set name, favorites-only, and recently added (7-day window) with removable filter chips.
+- **Interactive Dashboard**: Rich analytics panel with Chart.js visualizations (Type distribution doughnut, Rarity breakdown, Collection Growth over time), collection highlights, and fill-rates.
+- **Favorites Management**: Dedicated page to showcase favorited cards with Grid/List views, sorting (Newest, Oldest, Name A–Z, By Rarity), and quick highlight strips.
+- **Explicit Set Management**: Create and track card expansions independently with card counts, completion progress bars, search, and status filters.
 - **Export to PDF**: Generate high-quality printable A4 PDFs of your entire binder with proper pocket layouts, card artwork, name labels, and binder stats in the footer.
 - **Auto-Detect Environment**: The frontend automatically detects local vs. production environments and switches the API base URL accordingly.
 
@@ -36,7 +38,7 @@ A premium, full-stack web application for Pokémon Card collectors to digitize, 
 - Vanilla HTML5 / CSS3 / ES6 JavaScript
 - Chart.js 4.x (Data visualizations and analytics)
 - No build tools required (no React, no Node.js build step)
-- Google Fonts (`Inter` & `Bangers`)
+- Google Fonts (`Inter` & `Press Start 2P` pixel font)
 
 ---
 
@@ -106,6 +108,7 @@ pokemon_binder/
 ├── frontend/
 │   ├── index.html         # App structure & all modal templates
 │   ├── style.css          # Glassmorphism, holographic shimmer, & animations
+│   ├── pokedex_data.js    # 1,025 National Pokédex dataset (Gens 1–9)
 │   └── app.js             # State management, API fetching, Chart.js, & routing
 ├── schema.sql             # Base database table creation (binders + cards)
 ├── vercel.json            # Vercel frontend deployment config
