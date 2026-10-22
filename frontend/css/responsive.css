@@ -1,0 +1,100 @@
+/**
+ * ============================================================================
+ * POKÉMON BINDER — RESPONSIVE MEDIA QUERIES
+ * File: css/responsive.css
+ * ============================================================================
+ */
+
+@media (max-width: 1100px) {
+  .pokemon-card-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 820px) {
+  .pokedex-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .pokedex-summary-boxes {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .summary-box {
+    flex: 1;
+  }
+
+  .pokemon-card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .card-detail-layout,
+  .card-detail-layout-v3 {
+    grid-template-columns: 1fr;
+  }
+  
+  .card-detail-img-wrapper,
+  .cdm-left-showcase {
+    max-width: 100%;
+    border-right: none;
+    border-bottom: 2px solid #18181b;
+    padding: 1.5rem 1rem;
+  }
+
+  .cdm-right-details {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 680px) {
+  .top-nav-header {
+    height: auto;
+    padding: 0.65rem 0;
+  }
+
+  .nav-container {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .nav-menu {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
+
+  .binder-subbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+
+  .binder-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .pokemon-card-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .pk-card {
+    min-height: 260px;
+    padding: 0.65rem;
+  }
+
+  .pk-card-art {
+    max-height: 125px;
+  }
+}
+
+@media (max-width: 440px) {
+  .pokemon-card-grid {
+    grid-template-columns: 1fr;
+  }
+}

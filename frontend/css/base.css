@@ -1,0 +1,243 @@
+/**
+ * ============================================================================
+ * POKÉMON BINDER — BASE DESIGN SYSTEM & TOKENS
+ * File: css/base.css
+ * ============================================================================
+ */
+
+:root {
+  /* Brand colors */
+  --header-red: #E60023;
+  --header-red-dark: #c4001e;
+  --bg-page: #F3F3F5;
+  --bg-binder: #101426;
+  --bg-card-missing: #11182E;
+  --accent-gold: #FFD400;
+  --accent-gold-hover: #ffdf33;
+  
+  /* Text */
+  --text-dark: #111827;
+  --text-muted: #64748b;
+  --text-light: #f8fafc;
+  --text-dim: #94a3b8;
+
+  /* UI neutrals */
+  --border-light: #e2e8f0;
+  --border-dark: rgba(255, 255, 255, 0.08);
+  --border-missing: rgba(255, 212, 0, 0.2);
+
+  /* Status */
+  --green: #16a34a;
+  --green-bg: #f0fdf4;
+  --green-border: #bbf7d0;
+  --yellow: #d97706;
+  --yellow-bg: #fffbeb;
+  --yellow-border: #fef08a;
+  --red: #dc2626;
+  --red-bg: #fef2f2;
+  --red-border: #fecaca;
+  --blue: #2563eb;
+
+  /* Sizing & Transitions */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─── Reset & Base ──────────────────────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-page);
+  color: var(--text-dark);
+  font-family: var(--font-main);
+  min-height: 100vh;
+  line-height: 1.5;
+  overflow-x: hidden;
+  
+  /* Repeating low-contrast Poké Ball watermark pattern */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%23000000' stroke-width='1.8' opacity='0.045'%3E%3Ccircle cx='36' cy='36' r='26'/%3E%3Cline x1='10' y1='36' x2='26' y2='36'/%3E%3Cline x1='46' y1='36' x2='62' y2='36'/%3E%3Ccircle cx='36' cy='36' r='8'/%3E%3Ccircle cx='36' cy='36' r='3.5' fill='%23000000'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ─── Page Body & Content Area ──────────────────────────────────────────────── */
+.page-body {
+  flex: 1;
+  width: 100%;
+}
+
+.main-content-wrapper {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 4rem;
+}
+
+.font-pixel {
+  font-family: 'Press Start 2P', monospace;
+}
+
+/* ─── Buttons & Inputs ──────────────────────────────────────────────────────── */
+.btn {
+  font-family: var(--font-main);
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: var(--transition);
+}
+
+.btn-gold {
+  background: var(--accent-gold);
+  color: #12131a;
+}
+
+.btn-gold:hover {
+  background: var(--accent-gold-hover);
+}
+
+.btn-outline {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  color: var(--text-dark);
+}
+
+.btn-outline:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.btn-danger {
+  background: #fee2e2;
+  color: var(--red);
+  border: 1px solid #fecaca;
+}
+
+.btn-danger:hover {
+  background: #fecaca;
+}
+
+.btn-sm {
+  font-size: 0.75rem;
+  padding: 0.35rem 0.75rem;
+}
+
+.input-text,
+.input-select {
+  font-family: var(--font-main);
+  font-size: 0.875rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+  color: var(--text-dark);
+  outline: none;
+  width: 100%;
+}
+
+.input-text:focus,
+.input-select:focus {
+  border-color: #94a3b8;
+  box-shadow: 0 0 0 2px rgba(226, 232, 240, 0.5);
+}
+
+.input-sm {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+  width: auto;
+}
+
+/* ─── Floating Action Button (Scroll to top) ────────────────────────────────── */
+.floating-action-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--accent-gold);
+  color: #12131a;
+  border: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 99;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.floating-action-btn:hover {
+  transform: scale(1.08);
+  background: var(--accent-gold-hover);
+}
+
+/* ─── Toast & Helpers ───────────────────────────────────────────────────────── */
+#toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: #111827;
+  color: #ffffff;
+  padding: 0.65rem 1.25rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 999;
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  pointer-events: none;
+}
+
+#toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.empty-graphic {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.empty-title {
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin-bottom: 0.35rem;
+}
+
+.empty-desc {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  max-width: 400px;
+  margin: 0 auto 1.25rem;
+}

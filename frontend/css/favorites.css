@@ -1,0 +1,426 @@
+/**
+ * ============================================================================
+ * POKÉMON BINDER — FAVORITES VAULT & SHOWCASE STYLES
+ * File: css/favorites.css
+ * ============================================================================
+ */
+
+/* ─── Favorites Hero Banner ─────────────────────────────────────────────────── */
+.fav-hero-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem 2rem;
+  margin-bottom: 1.75rem;
+  box-shadow: 0 12px 30px -8px rgba(15, 23, 42, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.fav-hero-banner::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(244, 63, 94, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.fav-hero-tag {
+  display: inline-block;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: #fb7185;
+  background: rgba(244, 63, 94, 0.15);
+  border: 1px solid rgba(244, 63, 94, 0.35);
+  padding: 3px 10px;
+  border-radius: 9999px;
+  margin-bottom: 0.5rem;
+}
+
+.fav-hero-title {
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.fav-hero-subtitle {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  max-width: 650px;
+  line-height: 1.5;
+}
+
+.fav-hero-subtitle strong {
+  color: #f1f5f9;
+}
+
+.fav-hero-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+/* ─── View Toggle (Grid / List) ─────────────────────────────────────────────── */
+.view-toggle {
+  display: flex;
+  background: #f1f5f9;
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+
+.view-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.view-btn.active {
+  background: #ffffff;
+  color: var(--text-dark);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.fav-sort-select {
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+/* ─── Type Filter Bar ───────────────────────────────────────────────────────── */
+.fav-type-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.25rem;
+  scrollbar-width: thin;
+}
+
+/* ─── Spotlight Strip (Ultra Rares) ─────────────────────────────────────────── */
+.fav-spotlight-section {
+  background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(253, 224, 71, 0.25);
+  box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.35);
+}
+
+.fav-spotlight-title {
+  color: #ffd700;
+  font-size: 10px;
+  letter-spacing: 1px;
+  margin-bottom: 0.85rem;
+}
+
+.fav-highlights-strip {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scrollbar-width: thin;
+}
+
+.fav-spotlight-card {
+  min-width: 125px;
+  max-width: 125px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.fav-spotlight-card:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+.fav-spotlight-art-box {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2.5 / 3.5;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #ffd700;
+  box-shadow: 0 4px 14px rgba(255, 215, 0, 0.25);
+  background: #000;
+}
+
+.fav-spotlight-art-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fav-spotlight-badge {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  right: 4px;
+  background: rgba(15, 23, 42, 0.88);
+  color: #ffd700;
+  font-size: 7.5px;
+  text-align: center;
+  padding: 2px 4px;
+  border-radius: 4px;
+  backdrop-filter: blur(4px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fav-spotlight-name {
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  margin-top: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── Favorites Grid Mode ───────────────────────────────────────────────────── */
+.fav-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+  gap: 1.25rem;
+}
+
+.fav-card-item {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+  box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.05);
+}
+
+.fav-card-item:hover {
+  transform: translateY(-6px);
+  border-color: #fda4af;
+  box-shadow: 0 16px 32px -8px rgba(15, 23, 42, 0.12), 0 0 16px rgba(244, 63, 94, 0.15);
+}
+
+.fav-card-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fav-card-dex {
+  font-size: 9px;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+}
+
+.fav-heart-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 2px;
+  line-height: 1;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fav-heart-btn:hover {
+  transform: scale(1.3);
+}
+
+.fav-card-art-box {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2.5 / 3.5;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+}
+
+.fav-card-art-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fav-card-hologram-shimmer {
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(115deg, transparent 20%, rgba(255, 255, 255, 0.4) 45%, rgba(255, 215, 0, 0.3) 55%, transparent 80%);
+  pointer-events: none;
+  transition: left 0.75s ease;
+}
+
+.fav-card-item:hover .fav-card-hologram-shimmer {
+  left: 150%;
+}
+
+.fav-card-bottom-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fav-card-name {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fav-card-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.fav-card-type-pill {
+  color: #ffffff;
+  font-size: 9.5px;
+  font-weight: 800;
+  padding: 2px 7.5px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+}
+
+.fav-card-rarity-pill {
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 2px 7.5px;
+  border-radius: 9999px;
+  border: 1px solid #e2e8f0;
+}
+
+.fav-card-set-text {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── Favorites List Mode ───────────────────────────────────────────────────── */
+.fav-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.fav-list-row {
+  display: flex;
+  align-items: center;
+  gap: 1.15rem;
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fav-list-row:hover {
+  border-color: #fda4af;
+  transform: translateX(4px);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.fav-list-thumb {
+  width: 44px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--border-light);
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.fav-list-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fav-list-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fav-list-name {
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--text-dark);
+}
+
+.fav-list-dex {
+  font-size: 9.5px;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+}
+
+.fav-list-details-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.fav-list-set {
+  color: #64748b;
+  font-weight: 600;
+}
+
+.fav-list-right {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.fav-list-date {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.fav-empty-box {
+  background: #ffffff;
+  border: 2px dashed #cbd5e1;
+  border-radius: var(--radius-md);
+  padding: 3rem 1.5rem;
+  text-align: center;
+}

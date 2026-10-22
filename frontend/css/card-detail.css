@@ -1,0 +1,357 @@
+/**
+ * ============================================================================
+ * POKÉMON BINDER — CARD DETAIL & INSPECTION MODAL
+ * File: css/card-detail.css
+ * ============================================================================
+ */
+
+/* ─── Card Detail Modal (Image 3 Reference) ─────────────────────────────── */
+.card-detail-modal-v3 {
+  background: #ffffff;
+  border-radius: 20px;
+  width: 95%;
+  max-width: 920px;
+  max-height: 90vh;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+  border: 2px solid #18181b;
+  display: flex;
+  flex-direction: column;
+}
+
+.cdm-close-btn-red {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #e60023;
+  color: #ffffff;
+  border: 2px solid #18181b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 900;
+  cursor: pointer;
+  z-index: 60;
+  transition: transform 0.15s ease, background 0.15s ease;
+  box-shadow: 0 2px 8px rgba(230, 0, 35, 0.4);
+}
+
+.cdm-close-btn-red:hover {
+  transform: scale(1.12);
+  background: #dc2626;
+}
+
+.card-detail-layout-v3 {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  min-height: 520px;
+}
+
+/* Left Column: Dark Navy Artwork Showcase & Chevrons */
+.cdm-left-showcase {
+  background: #0f1422;
+  padding: 2.5rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-right: 2px solid #18181b;
+}
+
+.cdm-chevron-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #18181b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.cdm-chevron-btn:hover {
+  transform: translateY(-50%) scale(1.1);
+  background: #f4f4f5;
+}
+
+.cdm-chevron-prev {
+  left: 12px;
+}
+
+.cdm-chevron-next {
+  right: 12px;
+}
+
+.cdm-card-art-box {
+  width: 100%;
+  max-width: 260px;
+  aspect-ratio: 2.6 / 3.6;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.6);
+  background: #181c2e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.cdm-card-full-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Right Column: White Information Panel */
+.cdm-right-details {
+  background: #ffffff;
+  padding: 2.25rem 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow-y: auto;
+  max-height: 90vh;
+}
+
+.cdm-breadcrumbs {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+  color: #64748b;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.85rem;
+}
+
+.cdm-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.2rem;
+}
+
+.cdm-main-title {
+  font-size: 1.85rem;
+  font-weight: 900;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.cdm-title-num-red {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.15rem;
+  color: #e60023;
+  font-weight: 700;
+}
+
+.cdm-subtitle-text {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 0.85rem;
+}
+
+.cdm-badges-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.cdm-badge-teal {
+  background: #0d9488;
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.35rem 0.85rem;
+  border-radius: 6px;
+  letter-spacing: 0.04em;
+}
+
+.cdm-badge-green {
+  background: #10b981;
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.35rem 0.85rem;
+  border-radius: 6px;
+  letter-spacing: 0.04em;
+}
+
+.cdm-fav-toggle-btn {
+  background: #f1f5f9;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 6px;
+  width: 34px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.cdm-fav-toggle-btn:hover {
+  background: #e2e8f0;
+}
+
+.cdm-fav-toggle-btn.active {
+  background: #ffe4e6;
+  border-color: #fda4af;
+  box-shadow: 0 2px 6px rgba(244, 63, 94, 0.25);
+}
+
+.cdm-fav-badge {
+  display: none !important;
+}
+
+/* Specs Table (Image 3 format) */
+.cdm-specs-table {
+  border: 2px solid #18181b;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  background: #ffffff;
+}
+
+.cdm-table-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.9rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.cdm-table-row:last-child {
+  border-bottom: none;
+}
+
+.cdm-table-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  color: #475569;
+  letter-spacing: 0.03em;
+}
+
+.cdm-table-val {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.62rem;
+  color: #0f172a;
+  text-align: right;
+}
+
+.cdm-table-val.text-red {
+  color: #e60023;
+  font-weight: 700;
+}
+
+/* Quote Box */
+.cdm-quote-box {
+  border: 2px solid #18181b;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  font-size: 0.82rem;
+  color: #1e293b;
+  line-height: 1.45;
+  margin-bottom: 1.25rem;
+  background: #fafafa;
+}
+
+/* Action Buttons */
+.cdm-actions-v3 {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.cdm-btn-edit-del-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.cdm-action-btn {
+  padding: 0.65rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  border-radius: 50px;
+  border: 2px solid #18181b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.btn-edit-card {
+  background: #ffffff;
+  color: #18181b;
+}
+
+.btn-edit-card:hover {
+  background: #f4f4f5;
+  transform: translateY(-2px);
+}
+
+.btn-delete-card {
+  background: #e60023;
+  color: #ffffff;
+}
+
+.btn-delete-card:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+}
+
+.btn-delete-armed {
+  background: #991b1b !important;
+  color: #ffffff !important;
+  border-color: #7f1d1d !important;
+  animation: deleteArmPulse 0.8s ease infinite alternate;
+  font-weight: 900 !important;
+}
+
+@keyframes deleteArmPulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  100% { transform: scale(1.04); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+}
+
+.cdm-jump-page-btn {
+  width: 100%;
+  padding: 0.8rem 1.25rem;
+  border-radius: 50px;
+  background: #ffcb05;
+  color: #18181b;
+  border: 2px solid #18181b;
+  font-size: 0.85rem;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 14px rgba(255, 203, 5, 0.4);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.cdm-jump-page-btn:hover {
+  transform: translateY(-2px);
+  background: #fde047;
+}

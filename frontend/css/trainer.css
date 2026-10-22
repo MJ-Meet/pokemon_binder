@@ -1,0 +1,553 @@
+/**
+ * ============================================================================
+ * POKÉMON BINDER — HOME PAGE, TRAINER CARD & BINDERS SHOWCASE
+ * File: css/trainer.css
+ * ============================================================================
+ */
+
+/* ─── Home Page & Trainer Card (Matching Reference) ─────────────────────────── */
+.page-home {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.home-top-grid {
+  display: grid;
+  grid-template-columns: 480px 1fr;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+/* ── Trainer Card ── */
+.trainer-card-wrapper {
+  width: 100%;
+}
+
+.trainer-card {
+  background: #ffffff;
+  border: 3px solid #18181b;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.tc-header {
+  background: #E60023;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 3px solid #18181b;
+}
+
+.tc-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.88rem;
+  color: #ffffff;
+  text-shadow: 2px 2px 0 #18181b;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.tc-id {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.76rem;
+  color: #facc15;
+  font-weight: 700;
+  text-shadow: 1.5px 1.5px 0 #18181b;
+}
+
+.tc-body {
+  padding: 18px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Profile Row */
+.tc-profile-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tc-name-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tc-name-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.62rem;
+  color: #475569;
+  font-weight: 700;
+}
+
+.tc-name {
+  font-size: 1.85rem;
+  font-weight: 900;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  cursor: pointer;
+  border-bottom: 2px dashed transparent;
+  transition: var(--transition);
+}
+
+.tc-name:hover {
+  color: #E60023;
+  border-bottom-color: #E60023;
+}
+
+.tc-avatar-box {
+  width: 72px;
+  height: 72px;
+  background: #ffcb05;
+  border: 3px solid #18181b;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.tc-avatar-box:hover {
+  transform: scale(1.06);
+  border-color: #E60023;
+  box-shadow: 0 8px 18px rgba(230, 0, 35, 0.25);
+}
+
+.tc-avatar-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.tc-avatar-box:hover .tc-avatar-overlay {
+  opacity: 1;
+}
+
+.tc-avatar-img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+}
+
+.tc-avatar-box:hover .tc-avatar-img {
+  transform: scale(0.92);
+}
+
+.partner-color-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 2px solid #18181b;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.partner-color-btn:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.partner-color-btn.active {
+  outline: 2.5px solid #E60023;
+  outline-offset: 2px;
+}
+
+/* Stats Table */
+.tc-stats-table {
+  background: #ffffff;
+  border: 2.5px solid #18181b;
+  border-radius: 12px;
+  padding: 4px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.tc-stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 0;
+  border-bottom: 1.5px solid #f1f5f9;
+}
+
+.tc-stat-row:last-child {
+  border-bottom: none;
+}
+
+.tc-stat-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.62rem;
+  color: #334155;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.tc-stat-val {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.tc-stat-red {
+  color: #dc2626 !important;
+}
+
+.tc-stat-teal {
+  color: #0d9488 !important;
+}
+
+/* Badges Section */
+.tc-badges-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.tc-badges-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tc-badges-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.62rem;
+  color: #475569;
+  font-weight: 700;
+}
+
+.tc-badge-status {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.62rem;
+  color: #dc2626;
+  font-weight: 800;
+  transition: all 0.15s ease;
+}
+
+.tc-badges-strip {
+  background: #f1f5f9;
+  border: 2px solid #18181b;
+  border-radius: 14px;
+  padding: 6px 10px;
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  align-items: center;
+  justify-items: center;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.tc-badge-item {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  cursor: pointer;
+  padding: 4px 0;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  box-sizing: border-box;
+  transition: all 0.15s ease;
+}
+
+.tc-badge-item:hover,
+.tc-badge-item.active {
+  background: #ffffff;
+  border-color: #18181b;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.tc-badge-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+}
+
+.tc-badge-icon svg {
+  width: 26px;
+  height: 26px;
+  display: block;
+}
+
+.tc-badge-code {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  color: #64748b;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.tc-badge-item:hover .tc-badge-code,
+.tc-badge-item.active .tc-badge-code {
+  color: #18181b;
+}
+
+/* ── Binders Showcase (Home Page) ── */
+.home-binders-showcase {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.home-binders-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.home-binders-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+
+.home-binders-sub {
+  font-size: 0.825rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.home-binders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.125rem;
+}
+
+.home-binder-card {
+  background: #f8fafc;
+  border: 1.5px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
+  padding-left: 1.5rem;
+}
+
+.home-binder-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  border-color: #cbd5e1;
+}
+
+.home-binder-card.active-binder,
+.home-binder-card.is-active-binder {
+  border-color: #ffcb05;
+  box-shadow: 0 4px 18px rgba(255, 203, 5, 0.2);
+  background: #fffdf5;
+}
+
+.home-binder-spine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 6px;
+}
+
+.home-binder-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.home-binder-name {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  line-height: 1.2;
+}
+
+.home-binder-tag {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.home-binder-tag.active {
+  background: var(--accent-gold);
+  color: #12131a;
+}
+
+.home-binder-tag.select {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.home-binder-stats-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.home-binder-progress-track {
+  width: 100%;
+  height: 7px;
+  background: #e2e8f0;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.home-binder-progress-fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: 9999px;
+}
+
+.home-binder-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+/* HBC Modern Showcase Card styles */
+.hbc-spine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 8px;
+  border-top-left-radius: var(--radius-md);
+  border-bottom-left-radius: var(--radius-md);
+}
+
+.hbc-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+.hbc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.hbc-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.2rem 0.5rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.hbc-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.hbc-active-tag {
+  background: #ffcb05;
+  color: #18181b;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.hbc-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-sm);
+  padding: 0.5rem;
+}
+
+.hbc-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.hbc-stat-num {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.hbc-stat-lbl {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.hbc-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.hbc-progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
+.hbc-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}

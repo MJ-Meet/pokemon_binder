@@ -1,0 +1,261 @@
+/**
+ * ============================================================================
+ * POKÉMON BINDER — MODALS, FORM INPUTS & TYPE PICKERS
+ * File: css/modals.css
+ * ============================================================================
+ */
+
+/* ─── Modals Base Backdrop ─────────────────────────────────────────────────── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.modal-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modal-x-btn {
+  position: absolute;
+  top: 1.15rem;
+  right: 1.15rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #475569;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+.modal-x-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+  transform: scale(1.05);
+}
+
+.modal-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-bottom: 1.25rem;
+}
+
+.form-row {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.35rem;
+}
+
+.form-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.modal-btns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  margin-top: 1.5rem;
+}
+
+/* Grid Size Selector */
+.gs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.gs-btn {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem;
+  text-align: center;
+  cursor: pointer;
+  background: #f8fafc;
+}
+
+.gs-btn.active {
+  border-color: var(--accent-gold);
+  background: #fffbeb;
+  font-weight: 700;
+}
+
+.gs-mini {
+  display: grid;
+  gap: 2px;
+  height: 28px;
+  width: 28px;
+  margin: 0 auto 4px;
+}
+
+.gs-mini div {
+  background: #94a3b8;
+  border-radius: 1px;
+}
+
+/* Color selector */
+.color-grid {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.color-box {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.color-box.active {
+  border-color: #000000;
+  transform: scale(1.15);
+}
+
+/* Upload zone */
+.upload-zone {
+  border: 2px dashed var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  background: #f8fafc;
+  transition: var(--transition);
+}
+
+.upload-zone:hover {
+  border-color: #94a3b8;
+  background: #f1f5f9;
+}
+
+/* ─── Type Selector Grid & Buttons ───────────────────────────────────────── */
+.type-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+}
+
+.type-btn {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.5rem 0.35rem;
+  text-align: center;
+  cursor: pointer;
+  background: #ffffff;
+  font-size: 0.74rem;
+  font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.type-btn .type-icon {
+  font-size: 1.15rem;
+  line-height: 1;
+  transition: transform 0.18s ease;
+}
+
+.type-btn .type-name {
+  color: #475569;
+  font-weight: 700;
+  transition: color 0.18s ease;
+}
+
+.type-btn:hover {
+  border-color: #94a3b8;
+  background: #f8fafc;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+}
+
+.type-btn:hover .type-icon {
+  transform: scale(1.18);
+}
+
+.type-btn.active {
+  background: var(--type-color);
+  border-color: #18181b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2), 0 0 12px var(--type-bg);
+}
+
+.type-btn.active .type-name {
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.type-btn.active .type-icon {
+  transform: scale(1.18);
+}
+
+/* ─── Modal Red Circular Close Button ────────────────────────────────────── */
+.modal-x-btn-red {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #e60023;
+  color: #ffffff;
+  border: 2px solid #18181b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 900;
+  cursor: pointer;
+  z-index: 60;
+  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 4px 12px rgba(230, 0, 35, 0.4);
+  line-height: 1;
+}
+
+.modal-x-btn-red:hover {
+  transform: scale(1.12);
+  background: #dc2626;
+  box-shadow: 0 6px 16px rgba(230, 0, 35, 0.55);
+}
