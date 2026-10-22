@@ -267,7 +267,17 @@ POKEMON Binder/
 │   ├── index.html         # Application layout, modals, and views
 │   ├── style.css          # Glassmorphism, 3D card flip, and holographic shaders
 │   ├── pokedex_data.js    # 1,025 National Pokédex dataset (Gens 1–9)
-│   └── app.js             # State manager, 3D interactions, and Chart.js analytics
+│   ├── app.js             # Backward-compatible script loader & architecture manifest
+│   └── js/                # Modular client architecture
+│       ├── config.js      # Environment endpoints, types, state & cache helpers
+│       ├── trainer.js     # Trainer card, gym badges & partner Pokémon modal
+│       ├── binder.js      # 3D interactive binder views, page-turning & grid
+│       ├── card-detail.js # Fullscreen card inspection, 3D tilt & inline editor
+│       ├── card-studio.js # Card Studio, drag & drop image uploader
+│       ├── dashboard.js   # Chart.js analytics, pull activity & milestones
+│       ├── favorites.js   # Favorites vault, spotlight & view modes
+│       ├── expansions.js  # TCG expansion sets, master set progress tracking
+│       └── app.js         # App bootstrapper, SPA navigation router & shortcuts
 ├── schema.sql             # Base database table definitions
 ├── vercel.json            # Vercel zero-config static deployment manifest
 ├── netlify.toml           # Netlify publish directory configuration
@@ -312,7 +322,7 @@ Deploy the `backend/` directory as a Python web service connected to a managed P
 ### 2. Frontend (Vercel / Netlify)
 PokéBinder includes pre-configured `vercel.json` and `netlify.toml` files:
 1. Connect your GitHub repository to Vercel or Netlify.
-2. In `frontend/app.js`, set `PROD_API` to your live backend endpoint:
+2. In `frontend/js/config.js`, set `PROD_API` to your live backend endpoint:
    ```javascript
    const PROD_API = 'https://your-api.onrender.com';
    ```
