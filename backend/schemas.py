@@ -29,6 +29,7 @@ class BinderOut(BaseModel):
     pages:     int
     color:     str
     created_at: datetime
+    card_count: Optional[int] = 0
 
     model_config = {"from_attributes": True}
 

@@ -90,11 +90,14 @@ def root():
 
 @app.get("/binders", response_model=List[schemas.BinderOut])
 def list_binders(db: Session = Depends(get_db)):
-    return (
+    binders = (
         db.query(models.Binder)
         .order_by(models.Binder.created_at.desc())
         .all()
     )
+    for b in binders:
+        b.card_count = len(b.cards)
+    return binders
 
 
 @app.post("/binders", response_model=schemas.BinderOut, status_code=201)
