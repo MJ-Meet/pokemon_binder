@@ -82,10 +82,20 @@ Whether you are completing your **Gen 1 Kanto Master Set** or tracking all **1,0
 - **Jump to Page Navigation**: Instantly opens the exact binder page where the card is placed with a single click.
 - **Inline Editing & Armed Delete Protection**: Edit card details directly or safely delete cards with instant UI updates and confirmation safeguards.
 
-### 📊 Pro Collector Analytics & Management
-- **Chart.js Visualizations**: Type distribution doughnut chart, Rarity tier breakdown, and cumulative collection growth curve.
-- **Favorites Showcase**: Dedicated gallery for your crown jewels with instant sorting (Rarity, Date Added, Name A–Z) and Grid/List views.
-- **Set Expansion Tracker**: Manage card sets independently with progress bars, completion percentages, and status filters.
+### 📊 Pro Collector Analytics & Command Center
+- **Executive Analytics Dashboard**: Glassmorphic dark hero banner with live KPI cards tracking Total Cards, Pokédex % (`/1,025`), Favorites Vault, Tracked Sets, Elemental Affinity, and Crown Jewels (SAR, SIR & Gold).
+- **Chart.js Visualizations**: Elemental distribution doughnut with type badges, horizontal rarity tier breakdown bars, and cumulative collection acquisition spline.
+- **Recent Pull Activity & Milestones**: Live thumbnail feed of latest additions with rarity pills and Hall of Fame milestone cards.
+
+### ❤️ Favorites Showcase Vault & Trophy Spotlight
+- **Crown Jewels Spotlight**: Dedicated top showcase strip highlighting ultra-rare pulls with gold illuminated borders.
+- **Dual Display Modes**: Toggle seamlessly between authentic 3D interactive TCG card **Grid View** (with holographic shimmer and instant heart toggle) and compact **List View**.
+- **Elemental & Rarity Filtering**: Filter favorites by Pokémon element pills or sort by rarity tier, newest acquisitions, or alphabetically.
+
+### 🏅 TCG Expansions & Booster Box Tracker
+- **Master Set Tracking**: Real-time KPI summary bar showing tracked expansions, completed master sets, collected set cards, and overall portfolio completion %.
+- **Booster Box Style Cards**: Progress bars with dynamic color tiers, master set gold trophies (`🏆 MASTER SET`), and recent pull thumbnail avatars.
+- **1-Click Popular Set Presets**: Rapidly track expansions with built-in presets (Pokémon 151, Stellar Crown, Surging Sparks, Prismatic Evolutions, Paldean Fates, Obsidian Flames, etc.).
 - **Printable A4 PDF Export**: Export entire binders directly into printable A4 PDFs with card artwork, labels, and statistics.
 
 ---
