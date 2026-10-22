@@ -99,10 +99,13 @@
                       <h2 class="tc-name" id="tc_trainer_name" onclick="editTrainerName()" title="Click to edit name">
                         Meet</h2>
                     </div>
-                    <div class="tc-avatar-box" title="Partner Pokémon">
+                    <div class="tc-avatar-box" id="tc_avatar_box" onclick="openPartnerModal()" title="Click to change Partner Pokémon">
                       <img id="tc_partner_img"
-                        src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1017.png"
+                        src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png"
                         alt="Partner Pokémon" class="tc-avatar-img" />
+                      <div class="tc-avatar-overlay">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                      </div>
                     </div>
                   </div>
 
@@ -804,6 +807,74 @@
     </div>
   </div>
 
+  <!-- ─── Change Partner Pokémon Modal ───────────────────────────────────────── -->
+  <div id="partnerModalBackdrop" class="modal-backdrop" onclick="closePartnerModal()">
+    <div class="modal" onclick="event.stopPropagation()" style="max-width: 540px;">
+      <button class="modal-x-btn" onclick="closePartnerModal()" aria-label="Close">✕</button>
+      <div class="font-pixel" style="font-size: 9px; color: #E60023; letter-spacing: 1px; margin-bottom: 4px;">TRAINER PASSPORT</div>
+      <h2 class="modal-title" style="margin-top:0;">⚡ Choose Partner Pokémon</h2>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">Select your companion Pokémon to represent you on your official Trainer Card.</p>
+
+      <!-- Live Partner Preview Box -->
+      <div style="display: flex; align-items: center; gap: 1.15rem; padding: 1rem 1.25rem; background: #f8fafc; border-radius: 12px; border: 1.5px solid #e2e8f0; margin-bottom: 1.25rem;">
+        <div id="partner_preview_box" class="tc-avatar-box" style="width: 76px; height: 76px; background: #ffcb05; flex-shrink: 0; cursor: default;">
+          <img id="partner_preview_img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png" alt="Partner Preview" class="tc-avatar-img" style="width: 66px; height: 66px;">
+        </div>
+        <div>
+          <div id="partner_preview_name" style="font-size: 1.2rem; font-weight: 800; color: #1e293b;">Pikachu</div>
+          <div id="partner_preview_dex" class="font-pixel" style="font-size: 9px; color: #94a3b8; margin-top: 3px;">No. 0025 • Electric</div>
+          <div style="font-size: 11px; color: #10b981; font-weight: 700; margin-top: 4px;">✓ Ready to sync with Trainer Passport</div>
+        </div>
+      </div>
+
+      <!-- Quick Search / Dex ID input -->
+      <div class="form-row">
+        <label class="form-label">Search Pokémon Name or Dex No. (1–1,025)</label>
+        <div class="search-input-wrapper">
+          <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke-width="2"></circle><line x1="21" y1="21" x2="16.65" y2="16.65" stroke-width="2"></line></svg>
+          <input type="text" id="partner_search_input" class="pokedex-search-input" placeholder="Type Pokémon name (e.g. Charizard, Gengar, Lucario)..." oninput="handlePartnerSearch(this.value)">
+        </div>
+      </div>
+
+      <!-- Popular Iconic Presets -->
+      <div class="form-row">
+        <label class="form-label">Iconic Companion Presets</label>
+        <div class="set-preset-chips" id="partnerPresetChips">
+          <button type="button" class="set-preset-chip" onclick="setPartnerPreset(25, 'Pikachu', '#ffcb05')">⚡ Pikachu</button>
+          <button type="button" class="set-preset-chip" onclick="setPartnerPreset(6, 'Charizard', '#ff7043')">🔥 Charizard</button>
+          <button type="button" class="set-preset-chip" onclick="setPartnerPreset(94, 'Gengar', '#a855f7')">👻 Gengar</button>
+          <button type="button" class="set-preset-chip" onclick="setPartnerPreset(150, 'Mewtwo', '#8b5cf6')">🔮 Mewtwo</button>
+          <button type="button" class="set-preset-chip" onclick="setPartnerPreset(197, 'Umbreon', '#1e293b')">🌙 Umbreon</button>
+          <button type="button" class="set-preset-chip" onclick="setPartnerPreset(384, 'Rayquaza', '#10b981')">🐉 Rayquaza</button>
+          <button type="button" class="set-preset-chip" onclick="setPartnerPreset(448, 'Lucario', '#0284c7')">⚔️ Lucario</button>
+          <button type="button" class="set-preset-chip" onclick="setPartnerPreset(658, 'Greninja', '#0284c7')">🐸 Greninja</button>
+          <button type="button" class="set-preset-chip" onclick="setPartnerPreset(700, 'Sylveon', '#ec4899')">🌸 Sylveon</button>
+          <button type="button" class="set-preset-chip" onclick="setPartnerPreset(1017, 'Ogerpon', '#78c850')">👹 Ogerpon</button>
+        </div>
+      </div>
+
+      <!-- Background Theme Color -->
+      <div class="form-row">
+        <label class="form-label">Badge Frame Color</label>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="button" class="partner-color-btn" style="background:#ffcb05;" onclick="selectPartnerBg('#ffcb05')" title="Electric Yellow"></button>
+          <button type="button" class="partner-color-btn" style="background:#ff7043;" onclick="selectPartnerBg('#ff7043')" title="Fire Orange"></button>
+          <button type="button" class="partner-color-btn" style="background:#38bdf8;" onclick="selectPartnerBg('#38bdf8')" title="Water Blue"></button>
+          <button type="button" class="partner-color-btn" style="background:#78c850;" onclick="selectPartnerBg('#78c850')" title="Grass Green"></button>
+          <button type="button" class="partner-color-btn" style="background:#a855f7;" onclick="selectPartnerBg('#a855f7')" title="Psychic Purple"></button>
+          <button type="button" class="partner-color-btn" style="background:#06b6d4;" onclick="selectPartnerBg('#06b6d4')" title="Ice Teal"></button>
+          <button type="button" class="partner-color-btn" style="background:#1e293b;" onclick="selectPartnerBg('#1e293b')" title="Dark Slate"></button>
+          <button type="button" class="partner-color-btn" style="background:#e11d48;" onclick="selectPartnerBg('#e11d48')" title="Ruby Red"></button>
+        </div>
+      </div>
+
+      <div class="modal-btns" style="margin-top: 1.5rem;">
+        <button class="btn btn-outline" onclick="closePartnerModal()">Cancel</button>
+        <button class="btn btn-gold" onclick="savePartnerPokemon()">✓ Save Partner Pokémon</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ─── Card Upload / Add Modal ──────────────────────────────────────────── -->
   <div id="cardModalBackdrop" class="modal-backdrop" onclick="closeModals()">
     <div class="card-add-modal" onclick="event.stopPropagation()">
@@ -954,7 +1025,6 @@
 
           <div class="cdm-card-art-box">
             <img id="cdm_image" class="cdm-card-full-img" loading="lazy" alt="Card image">
-            <div id="cdm_fav_badge" class="cdm-fav-badge hidden">❤️</div>
           </div>
 
           <!-- Next Card Chevron -->
