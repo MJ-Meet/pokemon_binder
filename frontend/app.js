@@ -208,7 +208,7 @@ function openBinderRegion(gen) {
 }
 
 function editTrainerName() {
-  const curName = localStorage.getItem('trainer_name') || 'bamfies';
+  const curName = localStorage.getItem('trainer_name') || 'Meet';
   const newName = prompt('Enter Trainer Name:', curName);
   if (newName && newName.trim()) {
     localStorage.setItem('trainer_name', newName.trim());
@@ -226,7 +226,7 @@ function renderHomePage() {
 function renderTrainerCard() {
   const nameEl = document.getElementById('tc_trainer_name');
   if (nameEl) {
-    nameEl.textContent = localStorage.getItem('trainer_name') || 'bamfies';
+    nameEl.textContent = localStorage.getItem('trainer_name') || 'Meet';
   }
 
   const bNameEl = document.getElementById('tc_active_binder_name');
@@ -1677,26 +1677,74 @@ function renderDashboardStats(stats, allCards) {
   if (!grid) return;
 
   const total = allCards.length;
-  const favs  = allCards.filter(c => c.favorite).length;
+  const uniqueDexSlots = new Set(allCards.map(c => c.slot)).size;
+  const pokedexPct = ((uniqueDexSlots / 1025) * 100).toFixed(1);
+  const favs = allCards.filter(c => c.favorite).length;
+  const favsPct = total ? Math.round((favs / total) * 100) : 0;
 
   const typeCounts = {};
-  allCards.forEach(c => { typeCounts[c.card_type] = (typeCounts[c.card_type] || 0) + 1; });
-  const topType = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])[0];
+  allCards.forEach(c => { if (c.card_type) typeCounts[c.card_type] = (typeCounts[c.card_type] || 0) + 1; });
+  const topTypeEntry = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])[0];
+  const topTypeName = topTypeEntry ? topTypeEntry[0] : 'Normal';
+  const topTypeCount = topTypeEntry ? topTypeEntry[1] : 0;
+  const topTypeObj = POKEMON_TYPES.find(t => t.name.toLowerCase() === topTypeName.toLowerCase()) || { icon: '⭐', color: '#ffcb05' };
+
+  const premiumCount = allCards.filter(c => ['Gold', 'Special Art Rare (SAR)', 'Special Ilustration Art Rare'].includes(c.rarity)).length;
+  const masterSetsCount = allSets.filter(s => s.set_total_cards > 0 && s.collected >= s.set_total_cards).length;
 
   const statItems = [
-    { icon: '📦', val: total, label: 'Collected Cards', sub: `Across ${binders.length} binder${binders.length !== 1 ? 's' : ''}` },
-    { icon: '❤️', val: favs,  label: 'Favorites', sub: total ? `${Math.round(favs/total*100)}% of collection` : '0%' },
-    { icon: '🏅', val: allCardSets.length, label: 'Sets Tracked', sub: 'Expansions' },
-    { icon: '🔥', val: topType ? topType[1] : 0, label: topType ? `${topType[0]} Cards` : 'Top Type', sub: 'Most common' },
-    { icon: '✨', val: allCards.filter(c => ['Gold', 'Special Art Rare (SAR)', 'Special Ilustration Art Rare'].includes(c.rarity)).length, label: 'Premium Cards', sub: 'Gold & SAR' },
+    {
+      icon: '📦',
+      theme: 'red',
+      val: total,
+      label: 'TOTAL CARDS',
+      sub: `${uniqueDexSlots} / 1,025 Pokédex (${pokedexPct}%)`,
+      badge: `${binders.length} Binder${binders.length !== 1 ? 's' : ''}`
+    },
+    {
+      icon: '❤️',
+      theme: 'pink',
+      val: favs,
+      label: 'FAVORITES VAULT',
+      sub: `${favsPct}% of entire portfolio`,
+      badge: 'Curated'
+    },
+    {
+      icon: '🏅',
+      theme: 'gold',
+      val: allCardSets.length || allSets.length,
+      label: 'TRACKED SETS',
+      sub: `${masterSetsCount} Master Set${masterSetsCount !== 1 ? 's' : ''} Complete`,
+      badge: 'Expansions'
+    },
+    {
+      icon: topTypeObj.icon,
+      theme: 'type',
+      typeColor: topTypeObj.color,
+      val: topTypeCount,
+      label: `${topTypeName.toUpperCase()} AFFINITY`,
+      sub: `Most abundant element`,
+      badge: 'Top Type'
+    },
+    {
+      icon: '✨',
+      theme: 'rainbow',
+      val: premiumCount,
+      label: 'CROWN JEWELS',
+      sub: 'SAR, SIR & Gold Rares',
+      badge: 'Ultra Rare'
+    },
   ];
 
   grid.innerHTML = statItems.map(it => `
-    <div class="stat-card">
-      <div style="font-size:1.5rem;margin-bottom:0.25rem">${it.icon}</div>
-      <div class="stat-val">${it.val}</div>
-      <div class="stat-lbl">${it.label}</div>
-      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px">${it.sub}</div>
+    <div class="dash-stat-card dash-stat-${it.theme}" ${it.typeColor ? `style="--card-theme-color:${it.typeColor}"` : ''}>
+      <div class="dash-stat-top">
+        <div class="dash-stat-icon-box">${it.icon}</div>
+        <span class="dash-stat-badge">${it.badge}</span>
+      </div>
+      <div class="dash-stat-val">${it.val.toLocaleString()}</div>
+      <div class="dash-stat-lbl font-pixel">${it.label}</div>
+      <div class="dash-stat-sub">${it.sub}</div>
     </div>
   `).join('');
 }
@@ -1705,22 +1753,46 @@ function renderDashboardCharts(allCards) {
   // 1. Type Chart
   const typeCounts = {};
   POKEMON_TYPES.forEach(t => typeCounts[t.name] = 0);
-  allCards.forEach(c => { if (typeCounts[c.card_type] !== undefined) typeCounts[c.card_type]++; });
+  allCards.forEach(c => {
+    if (c.card_type && typeCounts[c.card_type] !== undefined) {
+      typeCounts[c.card_type]++;
+    }
+  });
 
   const typeLabels = Object.keys(typeCounts).filter(k => typeCounts[k] > 0);
   const typeData   = typeLabels.map(k => typeCounts[k]);
-  const typeColors = typeLabels.map(k => POKEMON_TYPES.find(t => t.name === k)?.color || '#888');
+  const typeColors = typeLabels.map(k => POKEMON_TYPES.find(t => t.name === k)?.color || '#94a3b8');
 
   if (typeChartInst) typeChartInst.destroy();
   const typeCanvas = document.getElementById('typeChart');
   if (typeCanvas) {
     typeChartInst = new Chart(typeCanvas.getContext('2d'), {
       type: 'doughnut',
-      data: { labels: typeLabels, datasets: [{ data: typeData, backgroundColor: typeColors, borderWidth: 2 }] },
+      data: {
+        labels: typeLabels,
+        datasets: [{
+          data: typeData.length ? typeData : [1],
+          backgroundColor: typeData.length ? typeColors : ['#e2e8f0'],
+          borderWidth: 2,
+          borderColor: '#ffffff',
+          hoverOffset: 6
+        }]
+      },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { position: 'right', labels: { boxWidth: 12 } } },
+        cutout: '68%',
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: {
+              boxWidth: 12,
+              boxHeight: 12,
+              font: { family: "'Inter', sans-serif", weight: 'bold', size: 11 },
+              color: '#334155'
+            }
+          }
+        },
       },
     });
   }
@@ -1732,7 +1804,19 @@ function renderDashboardCharts(allCards) {
 
   const rarLabels = RARITIES.filter(r => rarCounts[r] > 0);
   const rarData   = rarLabels.map(r => rarCounts[r]);
-  const rarColors = ['#94a3b8','#60a5fa','#4ade80','#facc15','#f87171','#c084fc','#f472b6','#fbbf24'];
+  const rarColorMap = {
+    'Common': '#94a3b8',
+    'Uncommon': '#60a5fa',
+    'Rare': '#3b82f6',
+    'Super Rare': '#8b5cf6',
+    'Baby Shiny': '#06b6d4',
+    'Rare Shiny': '#14b8a6',
+    'Ilusration Rare(IR)': '#f59e0b',
+    'Special Art Rare (SAR)': '#ec4899',
+    'Special Ilustration Art Rare': '#8b5cf6',
+    'Gold': '#ffd400'
+  };
+  const rarColors = rarLabels.map(r => rarColorMap[r] || '#ffd400');
 
   if (rarityChartInst) rarityChartInst.destroy();
   const rarCanvas = document.getElementById('rarityChart');
@@ -1740,14 +1824,23 @@ function renderDashboardCharts(allCards) {
     rarityChartInst = new Chart(rarCanvas.getContext('2d'), {
       type: 'bar',
       data: {
-        labels: rarLabels,
-        datasets: [{ data: rarData, backgroundColor: rarColors.slice(0, rarLabels.length), borderRadius: 6 }],
+        labels: rarLabels.length ? rarLabels : ['No Cards'],
+        datasets: [{
+          data: rarData.length ? rarData : [0],
+          backgroundColor: rarColors.length ? rarColors : ['#cbd5e1'],
+          borderRadius: 8,
+          borderSkipped: false
+        }],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         indexAxis: 'y',
         plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: '#f1f5f9' }, ticks: { font: { family: "'Inter', sans-serif" } } },
+          y: { grid: { display: false }, ticks: { font: { family: "'Inter', sans-serif", weight: 'bold' } } }
+        }
       },
     });
   }
@@ -1768,28 +1861,49 @@ function renderDashboardCharts(allCards) {
   if (growthChartInst) growthChartInst.destroy();
   const growthCanvas = document.getElementById('growthChart');
   if (growthCanvas) {
-    growthChartInst = new Chart(growthCanvas.getContext('2d'), {
+    const ctx = growthCanvas.getContext('2d');
+    const grad = ctx.createLinearGradient(0, 0, 0, 260);
+    grad.addColorStop(0, 'rgba(255, 203, 5, 0.35)');
+    grad.addColorStop(1, 'rgba(255, 203, 5, 0.01)');
+
+    growthChartInst = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: sortedMonths.map(m => {
+        labels: sortedMonths.length ? sortedMonths.map(m => {
           const [y, mo] = m.split('-');
           return new Date(parseInt(y), parseInt(mo) - 1).toLocaleDateString('en', { month: 'short', year: '2-digit' });
-        }),
+        }) : ['Today'],
         datasets: [{
-          label: 'Total Cards',
-          data: growthData,
+          label: 'Total Collected Cards',
+          data: growthData.length ? growthData : [allCards.length],
           fill: true,
           borderColor: '#ffcb05',
-          backgroundColor: 'rgba(255,203,5,0.08)',
-          tension: 0.4,
-          pointRadius: 4,
-          pointBackgroundColor: '#ffcb05',
+          borderWidth: 3,
+          backgroundColor: grad,
+          tension: 0.38,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          pointBackgroundColor: '#ffffff',
+          pointBorderColor: '#ffcb05',
+          pointBorderWidth: 2.5
         }],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#0f172a',
+            padding: 10,
+            titleFont: { family: "'Press Start 2P', monospace", size: 10 },
+            bodyFont: { family: "'Inter', sans-serif", weight: 'bold' }
+          }
+        },
+        scales: {
+          x: { grid: { color: '#f8fafc' }, ticks: { font: { family: "'Inter', sans-serif" } } },
+          y: { grid: { color: '#f1f5f9' }, ticks: { font: { family: "'Inter', sans-serif" }, precision: 0 } }
+        }
       },
     });
   }
@@ -1805,20 +1919,35 @@ function renderRecentCards(allCards) {
     .slice(0, 6);
 
   if (!sorted.length) {
-    list.innerHTML = `<p style="color:var(--text-muted);font-size:0.875rem">No cards added yet.</p>`;
+    list.innerHTML = `<div class="dash-empty-pulls">🎴 No cards logged yet. Open your binder and add your first Pokémon!</div>`;
     return;
   }
 
-  list.innerHTML = sorted.map(c => `
-    <div class="recent-card-row" onclick="openCardDetail(${c.id})">
-      <img src="${API}/cards/${c.id}/image" loading="lazy" alt="${esc(c.name)}">
-      <div style="flex:1">
-        <div class="recent-card-name">${esc(c.name)}</div>
-        <div class="recent-card-meta">${c.card_type || '—'} ${c.rarity ? '• ' + c.rarity : ''}</div>
+  list.innerHTML = sorted.map(c => {
+    const pad = String((c.slot !== null && c.slot !== undefined) ? c.slot + 1 : 1).padStart(4, '0');
+    const tDef = POKEMON_TYPES.find(t => t.name.toLowerCase() === (c.card_type || '').toLowerCase()) || { color: '#64748b' };
+    const dateStr = new Date(c.date_added).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+
+    return `
+      <div class="dash-recent-row" onclick="openCardDetail(${c.id}, ${(c.slot || 0) + 1})">
+        <div class="dash-recent-art-wrap">
+          <img src="${API}/cards/${c.id}/image" loading="lazy" alt="${esc(c.name)}" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${(c.slot || 0) + 1}.png'">
+        </div>
+        <div class="dash-recent-info">
+          <div class="dash-recent-title-row">
+            <span class="dash-recent-name">${esc(c.name)}</span>
+            <span class="dash-recent-dex font-pixel">#${pad}</span>
+          </div>
+          <div class="dash-recent-meta-row">
+            <span class="dash-recent-type-pill" style="background:${tDef.color}">${esc(c.card_type || 'Normal')}</span>
+            ${c.rarity ? `<span class="dash-recent-rarity-pill">${esc(c.rarity)}</span>` : ''}
+            ${c.set_name ? `<span class="dash-recent-set-name">${esc(c.set_name)}</span>` : ''}
+          </div>
+        </div>
+        <div class="dash-recent-date">${dateStr}</div>
       </div>
-      <span style="font-size:0.75rem;color:var(--text-muted)">${new Date(c.date_added).toLocaleDateString()}</span>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 function renderHighlights(stats, allCards) {
@@ -1827,24 +1956,29 @@ function renderHighlights(stats, allCards) {
 
   const favs = allCards.filter(c => c.favorite);
   const sets = new Set(allCards.filter(c => c.set_name).map(c => c.set_name));
+  const ultraRares = allCards.filter(c => ['Gold', 'Special Art Rare (SAR)', 'Special Ilustration Art Rare'].includes(c.rarity));
 
-  list.innerHTML = [
-    { icon: '❤️', label: 'Favorited Cards', value: favs.length },
-    { icon: '💎', label: 'Premium Rarity',  value: allCards.filter(c => ['Gold', 'Special Art Rare (SAR)'].includes(c.rarity)).length },
-    { icon: '📚', label: 'Sets Tracked',    value: sets.size },
-    { icon: '📦', label: 'Total Binders',   value: binders.length },
-  ].map(h => `
-    <div class="highlight-row">
-      <div style="font-size:1.5rem">${h.icon}</div>
-      <div style="flex:1">
-        <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;font-weight:700">${h.label}</div>
-        <div style="font-size:1.25rem;font-weight:800">${h.value}</div>
+  const items = [
+    { icon: '👑', title: 'MASTER CURATOR', desc: `${allCards.length} Total Cards across ${binders.length} active binder${binders.length !== 1 ? 's' : ''}`, bg: 'linear-gradient(135deg, #fffbeb, #fef3c7)' },
+    { icon: '💖', title: 'FAVORITES SHOWCASE', desc: `${favs.length} Pokémon cards marked as personal favorites`, bg: 'linear-gradient(135deg, #fff1f2, #ffe4e6)' },
+    { icon: '💎', title: 'ULTRA RARE VAULT', desc: `${ultraRares.length} Special Art Rares & Gold tier cards collected`, bg: 'linear-gradient(135deg, #f5f3ff, #ede9fe)' },
+    { icon: '🗺️', title: 'EXPANSION FRONTIER', desc: `${sets.size} Card sets and expansions actively collected`, bg: 'linear-gradient(135deg, #ecfdf5, #d1fae5)' }
+  ];
+
+  list.innerHTML = items.map(h => `
+    <div class="dash-highlight-card" style="background:${h.bg}">
+      <div class="dash-hl-icon">${h.icon}</div>
+      <div class="dash-hl-text">
+        <div class="dash-hl-title font-pixel">${h.title}</div>
+        <div class="dash-hl-desc">${h.desc}</div>
       </div>
     </div>
   `).join('');
 }
 
 // ── Favorites Implementation ──────────────────────────────────────────────────
+let favTypeFilter = 'all';
+
 async function loadFavorites() {
   try {
     const resp = await fetch(`${API}/favorites`);
@@ -1857,9 +1991,51 @@ async function loadFavorites() {
         allFavorites = bData.flatMap(b => (b.cards || []).filter(c => c.favorite));
       }
     }
+    renderFavTypeFilterPills();
     renderFavorites();
   } catch (e) {
     notify(`Could not load favorites: ${e.message}`, true);
+  }
+}
+
+function renderFavTypeFilterPills() {
+  const container = document.getElementById('favTypeFilterBar');
+  if (!container) return;
+
+  const usedTypes = new Set(allFavorites.map(c => c.card_type).filter(Boolean));
+  const typesToShow = POKEMON_TYPES.filter(t => usedTypes.has(t.name));
+
+  container.innerHTML = `
+    <button class="pill-btn ${favTypeFilter === 'all' ? 'active' : ''}" onclick="selectFavTypeFilter('all')">ALL TYPES (${allFavorites.length})</button>
+    ${typesToShow.map(t => {
+      const count = allFavorites.filter(c => c.card_type === t.name).length;
+      return `
+        <button class="pill-btn ${favTypeFilter === t.name ? 'active' : ''}" onclick="selectFavTypeFilter('${t.name}')">
+          ${t.icon} ${t.name.toUpperCase()} (${count})
+        </button>
+      `;
+    }).join('')}
+  `;
+}
+
+function selectFavTypeFilter(typeName) {
+  favTypeFilter = typeName;
+  renderFavTypeFilterPills();
+  renderFavorites();
+}
+
+async function toggleCardFavoriteDirect(cardId, e) {
+  if (e) e.stopPropagation();
+  try {
+    const resp = await fetch(`${API}/cards/${cardId}/favorite`, { method: 'PUT' });
+    if (resp.ok) {
+      const updated = await resp.json();
+      notify(updated.favorite ? 'Added to favorites ❤️' : 'Removed from favorites 🤍');
+      await loadFavorites();
+      if (curBinder) await fetchBinders();
+    }
+  } catch (err) {
+    notify('Failed to update favorite', true);
   }
 }
 
@@ -1867,13 +2043,46 @@ function renderFavorites() {
   const grid = document.getElementById('favGrid');
   const empty = document.getElementById('favEmpty');
   const subtitle = document.getElementById('favSubtitle');
+  const spotlightWrap = document.getElementById('favSpotlightWrap');
+  const spotlightStrip = document.getElementById('favHighlights');
 
-  if (subtitle) subtitle.textContent = `${allFavorites.length} card${allFavorites.length !== 1 ? 's' : ''} in your favorites`;
+  if (subtitle) {
+    const ultraCount = allFavorites.filter(c => ['Gold', 'Special Art Rare (SAR)', 'Special Ilustration Art Rare'].includes(c.rarity)).length;
+    subtitle.innerHTML = `<strong>${allFavorites.length}</strong> treasured card${allFavorites.length !== 1 ? 's' : ''} in your showcase • <strong>${ultraCount}</strong> ultra-rare pull${ultraCount !== 1 ? 's' : ''}`;
+  }
 
-  let sorted = [...allFavorites];
+  // Spotlight strip: Ultra rares
+  if (spotlightWrap && spotlightStrip) {
+    const ultraRares = allFavorites.filter(c => ['Gold', 'Special Art Rare (SAR)', 'Special Ilustration Art Rare', 'Ilusration Rare(IR)'].includes(c.rarity));
+    if (ultraRares.length > 0 && favTypeFilter === 'all') {
+      spotlightWrap.classList.remove('hidden');
+      spotlightStrip.innerHTML = ultraRares.slice(0, 8).map(c => `
+        <div class="fav-spotlight-card" onclick="openCardDetail(${c.id}, ${(c.slot || 0) + 1})">
+          <div class="fav-spotlight-art-box">
+            <img src="${API}/cards/${c.id}/image" alt="${esc(c.name)}" loading="lazy" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${(c.slot || 0) + 1}.png'">
+            <span class="fav-spotlight-badge font-pixel">${esc(c.rarity || 'RARE')}</span>
+          </div>
+          <div class="fav-spotlight-name">${esc(c.name)}</div>
+        </div>
+      `).join('');
+    } else {
+      spotlightWrap.classList.add('hidden');
+    }
+  }
+
+  let filtered = [...allFavorites];
+  if (favTypeFilter !== 'all') {
+    filtered = filtered.filter(c => c.card_type === favTypeFilter);
+  }
+
+  let sorted = [...filtered];
   if (favSortMode === 'date_desc') sorted.sort((a, b) => new Date(b.date_added || 0) - new Date(a.date_added || 0));
   else if (favSortMode === 'date_asc') sorted.sort((a, b) => new Date(a.date_added || 0) - new Date(b.date_added || 0));
   else if (favSortMode === 'name_asc') sorted.sort((a, b) => a.name.localeCompare(b.name));
+  else if (favSortMode === 'rarity_desc') {
+    const rScore = r => RARITIES.indexOf(r);
+    sorted.sort((a, b) => rScore(b.rarity) - rScore(a.rarity));
+  }
 
   if (!sorted.length) {
     grid.innerHTML = '';
@@ -1882,16 +2091,69 @@ function renderFavorites() {
   }
   empty.classList.add('hidden');
 
-  grid.innerHTML = sorted.map(c => `
-    <div class="recent-card-row" style="cursor:pointer" onclick="openCardDetail(${c.id})">
-      <img src="${API}/cards/${c.id}/image" style="width:50px;height:70px;object-fit:cover;border-radius:6px" alt="${esc(c.name)}">
-      <div style="flex:1">
-        <div style="font-weight:800;font-size:1rem">${esc(c.name)}</div>
-        <div style="font-size:0.8rem;color:var(--text-muted)">${esc(c.card_type)} • ${esc(c.set_name || 'No Set')}</div>
-      </div>
-      <div style="color:#ef4444;font-size:1.25rem">❤️</div>
-    </div>
-  `).join('');
+  if (favView === 'grid') {
+    grid.className = 'fav-cards-grid';
+    grid.innerHTML = sorted.map(c => {
+      const pad = String((c.slot !== null && c.slot !== undefined) ? c.slot + 1 : 1).padStart(4, '0');
+      const tDef = POKEMON_TYPES.find(t => t.name.toLowerCase() === (c.card_type || '').toLowerCase()) || { color: '#64748b' };
+      const setLabel = c.set_name ? `${esc(c.set_name)}${c.card_number ? ' #' + c.card_number : ''}` : 'Independent Card';
+
+      return `
+        <div class="fav-card-item" onclick="openCardDetail(${c.id}, ${(c.slot || 0) + 1})">
+          <div class="fav-card-top-bar">
+            <span class="fav-card-dex font-pixel">No. ${pad}</span>
+            <button class="fav-heart-btn active" onclick="toggleCardFavoriteDirect(${c.id}, event)" title="Remove from favorites">
+              ❤️
+            </button>
+          </div>
+
+          <div class="fav-card-art-box">
+            <img src="${API}/cards/${c.id}/image" loading="lazy" alt="${esc(c.name)}" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${(c.slot || 0) + 1}.png'">
+            <div class="fav-card-hologram-shimmer"></div>
+          </div>
+
+          <div class="fav-card-bottom-info">
+            <div class="fav-card-name">${esc(c.name)}</div>
+            <div class="fav-card-meta-row">
+              <span class="fav-card-type-pill" style="background:${tDef.color}">${esc(c.card_type || 'Normal')}</span>
+              ${c.rarity ? `<span class="fav-card-rarity-pill">${esc(c.rarity)}</span>` : ''}
+            </div>
+            <div class="fav-card-set-text">${setLabel}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } else {
+    // List view
+    grid.className = 'fav-cards-list';
+    grid.innerHTML = sorted.map(c => {
+      const pad = String((c.slot !== null && c.slot !== undefined) ? c.slot + 1 : 1).padStart(4, '0');
+      const tDef = POKEMON_TYPES.find(t => t.name.toLowerCase() === (c.card_type || '').toLowerCase()) || { color: '#64748b' };
+      const dateStr = c.date_added ? new Date(c.date_added).toLocaleDateString() : '—';
+      const setLabel = c.set_name ? `${esc(c.set_name)}${c.card_number ? ' #' + c.card_number : ''}` : 'Independent Card';
+
+      return `
+        <div class="fav-list-row" onclick="openCardDetail(${c.id}, ${(c.slot || 0) + 1})">
+          <img src="${API}/cards/${c.id}/image" class="fav-list-thumb" alt="${esc(c.name)}" loading="lazy" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${(c.slot || 0) + 1}.png'">
+          <div class="fav-list-main">
+            <div class="fav-list-title-row">
+              <span class="fav-list-name">${esc(c.name)}</span>
+              <span class="fav-list-dex font-pixel">No. ${pad}</span>
+            </div>
+            <div class="fav-list-details-row">
+              <span class="fav-card-type-pill" style="background:${tDef.color}">${esc(c.card_type || 'Normal')}</span>
+              ${c.rarity ? `<span class="fav-card-rarity-pill">${esc(c.rarity)}</span>` : ''}
+              <span class="fav-list-set">${setLabel}</span>
+            </div>
+          </div>
+          <div class="fav-list-right">
+            <span class="fav-list-date">${dateStr}</span>
+            <button class="fav-heart-btn active" onclick="toggleCardFavoriteDirect(${c.id}, event)" title="Remove from favorites">❤️</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
 }
 
 function setFavView(v) {
@@ -1909,18 +2171,44 @@ function setFavSort(v) {
 // ── Sets Implementation ───────────────────────────────────────────────────────
 async function loadSets() {
   try {
-    const resp = await fetch(`${API}/sets`);
-    if (resp.ok) allSets = await resp.json();
+    const [setsResp, cardSetsResp] = await Promise.all([
+      fetch(`${API}/sets`),
+      fetch(`${API}/card-sets`).catch(() => ({ ok: false }))
+    ]);
+
+    if (setsResp.ok) allSets = await setsResp.json();
+    if (cardSetsResp && cardSetsResp.ok) allCardSets = await cardSetsResp.json();
+
     renderSets();
   } catch (e) {
     notify(`Could not load sets: ${e.message}`, true);
   }
 }
 
+function renderSetsKPI() {
+  const kpiTotalSets = document.getElementById('kpi_total_sets');
+  const kpiCompleted = document.getElementById('kpi_completed_sets');
+  const kpiCards     = document.getElementById('kpi_total_collected_cards');
+  const kpiPct       = document.getElementById('kpi_overall_pct');
+
+  const totalSets = allSets.length;
+  const completedSets = allSets.filter(s => s.set_total_cards > 0 && s.collected >= s.set_total_cards).length;
+  const totalCollectedCards = allSets.reduce((sum, s) => sum + (s.collected || 0), 0);
+  const totalPossibleCards = allSets.reduce((sum, s) => sum + (s.set_total_cards || 0), 0);
+  const overallPct = totalPossibleCards > 0 ? ((totalCollectedCards / totalPossibleCards) * 100).toFixed(1) : 0;
+
+  if (kpiTotalSets) kpiTotalSets.textContent = totalSets;
+  if (kpiCompleted) kpiCompleted.textContent = completedSets;
+  if (kpiCards)     kpiCards.textContent = totalCollectedCards;
+  if (kpiPct)       kpiPct.textContent = `${overallPct}%`;
+}
+
 function renderSets() {
   const grid = document.getElementById('setsGrid');
   const empty = document.getElementById('setsEmpty');
   if (!grid) return;
+
+  renderSetsKPI();
 
   let filtered = [...allSets];
 
@@ -1930,7 +2218,7 @@ function renderSets() {
     filtered = filtered.filter(s => !s.set_total_cards || s.collected < s.set_total_cards);
   }
 
-  const query = document.getElementById('setSearchInput')?.value.toLowerCase() || '';
+  const query = document.getElementById('setSearchInput')?.value.toLowerCase().trim() || '';
   if (query) filtered = filtered.filter(s => s.set_name.toLowerCase().includes(query));
 
   if (setsSortMode === 'pct_desc') {
@@ -1951,27 +2239,133 @@ function renderSets() {
   empty.classList.add('hidden');
 
   grid.innerHTML = filtered.map(s => {
-    const pct = s.set_total_cards ? Math.round((s.collected / s.set_total_cards) * 100) : 0;
-    const isComplete = pct >= 100;
+    const totalCards = s.set_total_cards || 0;
+    const collected = s.collected || 0;
+    const pct = totalCards ? Math.min(100, Math.round((collected / totalCards) * 100)) : 0;
+    const isComplete = totalCards > 0 && collected >= totalCards;
+    const remaining = totalCards ? Math.max(0, totalCards - collected) : 0;
+
+    // Card sample avatars (if available)
+    const cardSamples = (s.cards || []).slice(0, 5);
 
     return `
-      <div class="set-card">
+      <div class="set-booster-card ${isComplete ? 'set-is-mastered' : ''}">
         <div class="set-card-header">
-          <div class="set-card-title">${esc(s.set_name)}</div>
-          <span style="font-size:0.75rem;font-weight:800;color:${isComplete ? 'var(--green)' : 'var(--text-muted)'}">
-            ${isComplete ? '✓ COMPLETE' : `${pct}%`}
-          </span>
+          <div class="set-card-title-group">
+            <span class="set-card-series-tag font-pixel">TCG EXPANSION</span>
+            <h3 class="set-card-title">${esc(s.set_name)}</h3>
+          </div>
+          ${isComplete ? `
+            <div class="set-complete-trophy-badge font-pixel">
+              🏆 MASTER SET
+            </div>
+          ` : `
+            <div class="set-pct-pill font-pixel ${pct > 40 ? 'pct-high' : 'pct-mid'}">
+              ${pct}%
+            </div>
+          `}
         </div>
+
         <div class="set-progress-track">
-          <div class="set-progress-bar" style="width:${Math.min(pct, 100)}%"></div>
+          <div class="set-progress-bar ${isComplete ? 'bar-complete' : (pct > 40 ? 'bar-high' : '')}" style="width: ${Math.max(pct, collected > 0 ? 4 : 0)}%"></div>
         </div>
-        <div class="set-progress-meta">
-          <span>${s.collected} of ${s.set_total_cards || '?'} cards</span>
-          <span>${s.set_total_cards ? `${s.set_total_cards - s.collected} remaining` : ''}</span>
+
+        <div class="set-stats-row">
+          <div class="set-stat-box">
+            <span class="set-stat-num">${collected}</span>
+            <span class="set-stat-label">COLLECTED</span>
+          </div>
+          <div class="set-stat-box">
+            <span class="set-stat-num">${totalCards || '?'}</span>
+            <span class="set-stat-label">TOTAL IN SET</span>
+          </div>
+          <div class="set-stat-box">
+            <span class="set-stat-num">${totalCards ? remaining : '—'}</span>
+            <span class="set-stat-label">REMAINING</span>
+          </div>
+        </div>
+
+        ${cardSamples.length > 0 ? `
+          <div class="set-card-samples-strip">
+            <span class="set-samples-label">RECENT PULLS:</span>
+            <div class="set-samples-avatars">
+              ${cardSamples.map(sc => `
+                <img src="${API}/cards/${sc.id}/image" 
+                     class="set-sample-thumb" 
+                     title="${esc(sc.name)} (#${sc.card_number || '?'})" 
+                     onclick="openCardDetail(${sc.id})"
+                     loading="lazy" 
+                     onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${(sc.slot || 0) + 1}.png'" />
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+
+        <div class="set-card-actions">
+          <button class="set-action-btn btn-view-set" onclick="filterBinderBySet('${esc(s.set_name)}')">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            View in Binder
+          </button>
+          <button class="set-action-btn btn-add-to-set" onclick="openCardModalForSet('${esc(s.set_name)}', ${totalCards})">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+            Add Card
+          </button>
+          ${s.set_id ? `
+            <button class="set-delete-btn" onclick="deleteSet(${s.set_id}, '${esc(s.set_name)}', event)" title="Delete tracked set">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          ` : ''}
         </div>
       </div>
     `;
   }).join('');
+}
+
+function filterBinderBySet(setName) {
+  navigateTo('binder');
+  const searchInput = document.getElementById('pokedexSearchInput');
+  if (searchInput) {
+    searchInput.value = setName;
+    curSearch = setName.toLowerCase();
+    renderBinderView();
+    notify(`Filtering binder by set: ${setName}`);
+  }
+}
+
+function openCardModalForSet(setName, totalCards) {
+  openCardModal(curSlot !== null ? curSlot : 0);
+  setTimeout(() => {
+    const setSelect = document.getElementById('cm_set_name');
+    if (setSelect) setSelect.value = setName;
+    const totalInput = document.getElementById('cm_set_total');
+    if (totalInput) totalInput.value = totalCards || '';
+  }, 50);
+}
+
+function applySetPreset(name, total) {
+  const nameInput = document.getElementById('set_add_name');
+  const totalInput = document.getElementById('set_add_total_cards');
+  if (nameInput) nameInput.value = name;
+  if (totalInput) totalInput.value = total;
+}
+
+async function deleteSet(setId, setName, event) {
+  if (event) event.stopPropagation();
+  if (!confirm(`Are you sure you want to stop tracking expansion "${setName}"? (Your cards will not be deleted).`)) {
+    return;
+  }
+  try {
+    const resp = await fetch(`${API}/card-sets/${setId}`, { method: 'DELETE' });
+    if (!resp.ok) {
+      throw new Error(`Server returned ${resp.status}`);
+    }
+    notify(`Set "${setName}" removed from tracking.`);
+    allSets = allSets.filter(s => s.set_id !== setId);
+    allCardSets = allCardSets.filter(s => s.id !== setId);
+    loadSets();
+  } catch (err) {
+    notify(`Failed to remove set: ${err.message}`, true);
+  }
 }
 
 function filterSets(query) { renderSets(); }
