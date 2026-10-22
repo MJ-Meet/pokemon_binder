@@ -265,10 +265,22 @@ POKEMON Binder/
 │   └── requirements.txt   # Python pip dependency requirements
 ├── frontend/
 │   ├── index.html         # Application layout, modals, and views
-│   ├── style.css          # Glassmorphism, 3D card flip, and holographic shaders
+│   ├── style.css          # Backward-compatible modular CSS loader & imports
 │   ├── pokedex_data.js    # 1,025 National Pokédex dataset (Gens 1–9)
 │   ├── app.js             # Backward-compatible script loader & architecture manifest
-│   └── js/                # Modular client architecture
+│   ├── css/               # Modular CSS design architecture
+│   │   ├── base.css       # Tokens, reset, buttons, inputs & toasts
+│   │   ├── nav.css        # Sticky header, branding & mobile navigation
+│   │   ├── trainer.css    # Trainer passport, gym badges & binder showcase
+│   │   ├── binder.css     # Pokédex filters, 3D flip card grid & pagination
+│   │   ├── modals.css     # Base modal dialogs, close buttons & color pickers
+│   │   ├── card-studio.css# Card Studio uploader, preview & drag-and-drop
+│   │   ├── card-detail.css# Fullscreen card inspector, tilt shader & inline editor
+│   │   ├── dashboard.css  # Chart.js metrics, recent pulls & milestones
+│   │   ├── favorites.css  # Curated favorites vault, spotlight & view modes
+│   │   ├── expansions.css # Expansion booster cards, set KPI & master set tracker
+│   │   └── responsive.css # Responsive viewport breakpoints
+│   └── js/                # Modular client JavaScript architecture
 │       ├── config.js      # Environment endpoints, types, state & cache helpers
 │       ├── trainer.js     # Trainer card, gym badges & partner Pokémon modal
 │       ├── binder.js      # 3D interactive binder views, page-turning & grid
