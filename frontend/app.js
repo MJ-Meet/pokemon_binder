@@ -217,6 +217,96 @@ function editTrainerName() {
   }
 }
 
+// ── Trainer Partner Pokémon Management ────────────────────────────────────────
+let curPartnerDexId = 25;
+let curPartnerName = 'Pikachu';
+let curPartnerBg = '#ffcb05';
+let curPartnerImg = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png';
+
+function openPartnerModal() {
+  const storedImg = localStorage.getItem('trainer_partner_img') || 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png';
+  const storedBg  = localStorage.getItem('trainer_partner_bg') || '#ffcb05';
+  const storedName = localStorage.getItem('trainer_partner_name') || 'Pikachu';
+  const storedDex = localStorage.getItem('trainer_partner_dex') || '25';
+
+  curPartnerImg = storedImg;
+  curPartnerBg = storedBg;
+  curPartnerName = storedName;
+  curPartnerDexId = parseInt(storedDex) || 25;
+
+  updatePartnerPreview();
+
+  const backdrop = document.getElementById('partnerModalBackdrop');
+  if (backdrop) backdrop.classList.add('active');
+}
+
+function closePartnerModal() {
+  const backdrop = document.getElementById('partnerModalBackdrop');
+  if (backdrop) backdrop.classList.remove('active');
+}
+
+function updatePartnerPreview() {
+  const pBox = document.getElementById('partner_preview_box');
+  const pImg = document.getElementById('partner_preview_img');
+  const pName = document.getElementById('partner_preview_name');
+  const pDex = document.getElementById('partner_preview_dex');
+
+  if (pBox) pBox.style.background = curPartnerBg;
+  if (pImg) pImg.src = curPartnerImg;
+  if (pName) pName.textContent = curPartnerName;
+  if (pDex) {
+    const pad = String(curPartnerDexId).padStart(4, '0');
+    pDex.textContent = `No. ${pad}`;
+  }
+}
+
+function setPartnerPreset(dexId, name, color) {
+  curPartnerDexId = dexId;
+  curPartnerName = name;
+  curPartnerBg = color;
+  curPartnerImg = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${dexId}.png`;
+  updatePartnerPreview();
+}
+
+function selectPartnerBg(color) {
+  curPartnerBg = color;
+  updatePartnerPreview();
+}
+
+function handlePartnerSearch(query) {
+  if (!query || !query.trim()) return;
+  const q = query.trim().toLowerCase();
+
+  let found = null;
+  if (typeof POKEDEX_DATA !== 'undefined' && Array.isArray(POKEDEX_DATA)) {
+    if (!isNaN(q)) {
+      found = POKEDEX_DATA.find(p => p.id === parseInt(q));
+    } else {
+      found = POKEDEX_DATA.find(p => p.name.toLowerCase().includes(q));
+    }
+  }
+
+  if (found) {
+    curPartnerDexId = found.id;
+    curPartnerName = found.name;
+    curPartnerImg = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${found.id}.png`;
+    const tDef = (typeof POKEMON_TYPES !== 'undefined') ? POKEMON_TYPES.find(t => t.name.toLowerCase() === (found.type || '').toLowerCase()) : null;
+    if (tDef) curPartnerBg = tDef.color;
+    updatePartnerPreview();
+  }
+}
+
+function savePartnerPokemon() {
+  localStorage.setItem('trainer_partner_img', curPartnerImg);
+  localStorage.setItem('trainer_partner_bg', curPartnerBg);
+  localStorage.setItem('trainer_partner_name', curPartnerName);
+  localStorage.setItem('trainer_partner_dex', String(curPartnerDexId));
+
+  renderTrainerCard();
+  closePartnerModal();
+  notify(`Trainer partner set to ${curPartnerName}! ⚡`);
+}
+
 // ── Home Page & Trainer Card Rendering ────────────────────────────────────────
 function renderHomePage() {
   renderTrainerCard();
@@ -228,6 +318,13 @@ function renderTrainerCard() {
   if (nameEl) {
     nameEl.textContent = localStorage.getItem('trainer_name') || 'Meet';
   }
+
+  const partnerImg = localStorage.getItem('trainer_partner_img') || 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png';
+  const partnerBg = localStorage.getItem('trainer_partner_bg') || '#ffcb05';
+  const partnerEl = document.getElementById('tc_partner_img');
+  const avatarBox = document.getElementById('tc_avatar_box');
+  if (partnerEl) partnerEl.src = partnerImg;
+  if (avatarBox) avatarBox.style.background = partnerBg;
 
   const bNameEl = document.getElementById('tc_active_binder_name');
   if (bNameEl) {
@@ -1079,11 +1176,16 @@ function closeCardDetail() {
 function updateFavBtnState(isFav) {
   const icon = document.getElementById('cdm_fav_icon');
   const text = document.getElementById('cdm_fav_text');
+  const btn  = document.getElementById('cdm_fav_btn');
   const badge = document.getElementById('cdm_fav_badge');
 
   if (icon) icon.textContent = isFav ? '❤️' : '🤍';
   if (text) text.textContent = isFav ? 'Remove Favorite' : 'Add Favorite';
-  if (badge) badge.classList.toggle('hidden', !isFav);
+  if (btn) {
+    btn.classList.toggle('active', !!isFav);
+    btn.title = isFav ? 'Favorited card (click to remove)' : 'Add to favorites';
+  }
+  if (badge) badge.classList.add('hidden');
 }
 
 async function toggleCardDetailFavorite() {
