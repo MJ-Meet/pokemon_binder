@@ -1,6 +1,6 @@
 <div align="center">
 
-  <img src="frontend/assets/logo_binder.jpg" width="180" height="180" style="border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);" alt="PokéBinder Logo" />
+  <img src="frontend/assets/logo_binder.png" width="200" alt="PokéBinder Logo" />
 
   # ⚡ POKÉBINDER ⚡
   ### The Ultimate National Pokédex Portfolio & 3D Interactive TCG Card Binder
