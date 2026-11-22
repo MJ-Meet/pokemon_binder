@@ -36,6 +36,7 @@ function jumpToCurrentCardPage() {
     navigateTo('binder');
   }
   curPage = targetPage;
+  if (typeof resetPageFlipState === 'function') resetPageFlipState();
   renderBinderView();
 
   setTimeout(() => {

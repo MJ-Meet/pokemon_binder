@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Press+Start+2P&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Oxanium:wght@600;700;800&family=Press+Start+2P&display=swap"
     rel="stylesheet" />
   <!-- Chart.js CDN for Analytics Dashboard -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -440,6 +440,12 @@
 
               <!-- Page Navigation Controls -->
               <div class="binder-nav-controls">
+                <button type="button" class="binder-nav-btn binder-flip-all-btn" id="btnFlipAll" onclick="toggleFlipAllCards()" aria-pressed="false" title="Flip all cards on this page">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  <span id="btnFlipAllLabel">FLIP ALL</span>
+                </button>
                 <button class="binder-nav-btn" id="btnPrevPage" onclick="changeBinderPage(-1)" title="Previous Page">
                   <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />

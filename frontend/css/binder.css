@@ -320,6 +320,7 @@
 .binder-nav-controls {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.65rem;
 }
 
@@ -349,6 +350,34 @@
   cursor: not-allowed;
 }
 
+.binder-flip-all-btn {
+  border-color: rgba(255, 212, 0, 0.32);
+  color: #fef08a;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.binder-flip-all-btn:hover:not(:disabled) {
+  background: rgba(255, 212, 0, 0.14);
+  border-color: rgba(255, 212, 0, 0.72);
+  color: #ffd400;
+}
+
+.binder-flip-all-btn.is-active {
+  background: rgba(255, 212, 0, 0.18);
+  border-color: rgba(255, 212, 0, 0.85);
+  color: #ffd400;
+  box-shadow: 0 0 14px rgba(255, 212, 0, 0.18);
+}
+
+.binder-flip-all-btn.is-active svg {
+  transform: rotate(180deg);
+}
+
+.binder-flip-all-btn svg {
+  transition: transform 0.35s cubic-bezier(0.24, 0.86, 0.32, 1);
+}
+
 .binder-page-indicator {
   color: #94a3b8;
   font-size: 0.8rem;
@@ -365,15 +394,17 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1.125rem;
+  align-items: stretch;
 }
 
-/* Base Pokémon Card Style (3D Perspective Container) */
+/* Base Pokémon Card Style (Stationary 3D Perspective Hitbox — Prevents Hover Flicker) */
 .pk-card {
-  aspect-ratio: 2.6 / 3.6;
+  width: 100%;
+  aspect-ratio: 2.6 / 3.65;
   min-height: 330px;
-  perspective: 1200px;
+  perspective: 1100px;
+  perspective-origin: 50% 50%;
   position: relative;
-  cursor: pointer;
   user-select: none;
   background: transparent !important;
   border: none !important;
@@ -381,55 +412,150 @@
   box-shadow: none !important;
   border-radius: var(--radius-md);
   outline: none;
+  box-sizing: border-box;
+  z-index: 1;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pk-card-collected {
+  cursor: pointer;
+}
+
+.pk-card-missing {
+  cursor: pointer;
 }
 
 .pk-card:focus-visible {
-  outline: 2.5px solid #ffcb05;
+  outline: 2.5px solid #f5c542;
   outline-offset: 4px;
+  z-index: 20;
 }
 
-/* Inner 3D Flipper Element */
+.pk-card.is-flipped {
+  z-index: 5;
+}
+
+.pk-card:has(:focus-visible) {
+  z-index: 20;
+}
+
+/* 3D Elevation Stage (Smooth Reversible Lift on Hover / Flip / Keyboard Focus) */
+.pk-card-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform: translateY(0) translateZ(0) scale(1);
+  transition: transform 700ms cubic-bezier(0.24, 0.86, 0.32, 1);
+  z-index: 2;
+}
+
+/* Inner 3D Flipper Element (Genuine rotateY(180deg) Vertical Axis Rotation) */
 .pk-card-inner {
   position: relative;
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
-  transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: rotateY(0deg);
+  transition: transform 700ms cubic-bezier(0.24, 0.86, 0.32, 1);
   border-radius: var(--radius-md);
+  box-sizing: border-box;
 }
 
-/* Flipped State */
-.pk-card.is-flipped .pk-card-inner {
-  transform: rotateY(180deg);
-}
+/* Automatic Hover-to-Flip on Desktop Pointer Devices (Respected unless overridden/suppressed) */
+@media (hover: hover) and (pointer: fine) {
+  .pk-card:hover {
+    z-index: 25;
+  }
 
-/* Hover Elevation */
-.pk-card:hover:not(.is-flipped) .pk-card-inner {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
-}
+  .pk-card:hover:not(.is-hover-suppressed):not(.is-unflipped-override) .pk-card-stage {
+    transform: translateY(-6px) translateZ(20px) scale(1.018);
+    will-change: transform;
+  }
 
-.pk-card.is-flipped:hover .pk-card-inner {
-  transform: rotateY(180deg) translateY(-4px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
-}
-
-/* Reduced Motion Alternative */
-@media (prefers-reduced-motion: reduce) {
-  .pk-card-inner {
-    transition: transform 0.05s ease !important;
+  .pk-card:hover:not(.is-hover-suppressed):not(.is-unflipped-override) .pk-card-inner {
+    transform: rotateY(180deg);
+    will-change: transform;
   }
 }
 
-/* Both Card Faces */
-.pk-card-face {
+/* Pinned / Flip-All / Touch / Keyboard Focus Reveal States (Overrides mouse-leave cleanly) */
+.pk-card.is-flipped .pk-card-stage {
+  transform: translateY(-2px) translateZ(8px) scale(1);
+  will-change: transform;
+}
+
+.pk-card:focus-visible:not(.is-unflipped-override) .pk-card-stage,
+.pk-card:has(:focus-visible):not(.is-unflipped-override) .pk-card-stage {
+  transform: translateY(-6px) translateZ(20px) scale(1.018);
+  will-change: transform;
+}
+
+.pk-card.is-flipped .pk-card-inner,
+.pk-card:focus-visible:not(.is-unflipped-override) .pk-card-inner,
+.pk-card:has(:focus-visible):not(.is-unflipped-override) .pk-card-inner {
+  transform: rotateY(180deg);
+  will-change: transform;
+}
+
+/* Hover lift while already flipped (pinned or Flip All) */
+@media (hover: hover) and (pointer: fine) {
+  .pk-card.is-flipped:hover .pk-card-stage {
+    transform: translateY(-6px) translateZ(20px) scale(1.018);
+  }
+}
+
+/* ─── Subtle Golden Outer Aura (Behind Card During Hover / Flip) ────────────── */
+.pk-card-aura {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: -10px;
+  border-radius: 16px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.42s ease;
+}
+
+.pk-card-aura::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: 14px;
+  background: radial-gradient(ellipse at 50% 50%,
+      rgba(245, 197, 66, 0.28) 0%,
+      rgba(217, 144, 24, 0.1) 50%,
+      transparent 76%);
+  filter: blur(10px);
+}
+
+.pk-card-aura-missing::before {
+  background: radial-gradient(ellipse at 50% 50%,
+      rgba(255, 212, 0, 0.22) 0%,
+      rgba(217, 144, 24, 0.08) 48%,
+      transparent 76%);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pk-card:hover:not(.is-hover-suppressed):not(.is-unflipped-override) .pk-card-aura {
+    opacity: 0.9;
+  }
+}
+
+.pk-card.is-flipped .pk-card-aura,
+.pk-card:focus-visible:not(.is-unflipped-override) .pk-card-aura,
+.pk-card:has(:focus-visible):not(.is-unflipped-override) .pk-card-aura {
+  opacity: 0.9;
+}
+
+/* ─── Both Card Faces (Identical Aligned Dimensions & Hidden Backface) ──────── */
+.pk-card-face {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
   border-radius: var(--radius-md);
-  padding: 0.875rem;
+  padding: 0.75rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -439,23 +565,57 @@
   overflow: hidden;
 }
 
-/* ── Front Face ── */
 .pk-card-front {
-  transform: rotateY(0deg);
+  transform: rotateY(0deg) translateZ(1px);
   z-index: 2;
 }
 
+.pk-card-back {
+  transform: rotateY(180deg) translateZ(1px);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Enable reverse clicks & prevent front click-through whenever card is revealed */
+@media (hover: hover) and (pointer: fine) {
+  .pk-card:hover:not(.is-hover-suppressed):not(.is-unflipped-override) .pk-card-front {
+    pointer-events: none;
+  }
+
+  .pk-card:hover:not(.is-hover-suppressed):not(.is-unflipped-override) .pk-card-back {
+    pointer-events: auto;
+  }
+}
+
+.pk-card.is-flipped .pk-card-front,
+.pk-card:focus-visible:not(.is-unflipped-override) .pk-card-front,
+.pk-card:has(:focus-visible):not(.is-unflipped-override) .pk-card-front {
+  pointer-events: none;
+}
+
+.pk-card.is-flipped .pk-card-back,
+.pk-card:focus-visible:not(.is-unflipped-override) .pk-card-back,
+.pk-card:has(:focus-visible):not(.is-unflipped-override) .pk-card-back {
+  pointer-events: auto;
+}
+
 /* Top Row: Dex number & status badge */
-.pk-card-top {
+.pk-card-top,
+.pk-card-top-v1 {
+  height: 28px;
+  min-height: 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+  flex-shrink: 0;
 }
 
 .pk-card-number {
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.04em;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .pk-card-badge {
@@ -463,42 +623,51 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 26px;
+  height: 26px;
 }
 
 /* Center Image Container */
 .pk-card-art-wrap {
   flex: 1;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem 0;
+  padding: 0.25rem 0;
   overflow: hidden;
 }
 
 .pk-card-art {
   max-width: 82%;
-  max-height: 175px;
+  max-height: 170px;
   object-fit: contain;
-  transition: transform 0.25s ease;
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.pk-card:hover .pk-card-art {
-  transform: scale(1.05);
-}
-
-/* Bottom Row: Pokémon Name */
-.pk-card-bottom {
+/* Bottom Row: Pokémon Name & Sublabel */
+.pk-card-bottom,
+.pk-card-bottom-v1 {
+  min-height: 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   text-align: center;
-  padding-top: 0.35rem;
+  flex-shrink: 0;
+  padding-top: 0.2rem;
 }
 
-.pk-card-name {
-  font-size: 1rem;
-  font-weight: 800;
+.pk-card-name,
+.pk-card-name-v1 {
+  font-size: 1.05rem;
+  font-weight: 900;
   letter-spacing: -0.01em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 100%;
+  line-height: 1.2;
 }
 
 .pk-card-sublabel {
@@ -506,20 +675,29 @@
   font-weight: 600;
   margin-top: 2px;
   text-transform: uppercase;
+  line-height: 1.2;
 }
 
-/* ── Front Face Styling (Image 1 Reference) ── */
+/* ── Front Face Styling (Collected Pokémon Card Front — Preserved) ──────────── */
 .pk-card-front-v1 {
   background: #ffffff;
   border: 2px solid #18181b;
   border-radius: var(--radius-md);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  transform: rotateY(0deg);
-  z-index: 2;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
   padding: 0.75rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transition: border-color 0.32s ease, box-shadow 0.35s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pk-card-collected:hover:not(.is-hover-suppressed):not(.is-unflipped-override) .pk-card-front-v1 {
+    border-color: rgba(245, 197, 66, 0.9);
+    box-shadow:
+      0 14px 30px rgba(0, 0, 0, 0.45),
+      0 0 22px rgba(245, 197, 66, 0.32);
+  }
 }
 
 .pk-card-top-v1 {
@@ -557,14 +735,17 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition: transform 0.15s ease, background 0.15s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
   padding: 0;
 }
 
-.pk-card-expand-circle:hover {
+.pk-card-expand-circle:hover,
+.pk-card-expand-circle:focus-visible {
   transform: scale(1.12);
   background: #fde047;
+  box-shadow: 0 0 12px rgba(255, 203, 5, 0.55);
+  outline: none;
 }
 
 .pk-card-miniball {
@@ -591,168 +772,255 @@
   text-overflow: ellipsis;
 }
 
-/* ── Back Face (Image 2: Full TCG Card with Expand Button & Yellow Title) ── */
-.pk-card-back-v2 {
-  transform: rotateY(180deg);
-  background: #0f1422;
-  border: 2px solid #18181b;
-  border-radius: var(--radius-md);
-  padding: 0.65rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+/* ─── Subtle Specular Golden Edge Sheen During Flip ─────────────────────────── */
+.pk-card-sheen {
+  position: absolute;
+  inset: -12%;
+  pointer-events: none;
+  z-index: 8;
+  opacity: 0;
+  background: linear-gradient(112deg,
+      transparent 26%,
+      rgba(254, 243, 199, 0.08) 42%,
+      rgba(251, 207, 82, 0.3) 50%,
+      rgba(254, 243, 199, 0.08) 58%,
+      transparent 74%);
+  transform: translateX(-130%);
 }
 
-.pk-expand-on-back {
+@media (hover: hover) and (pointer: fine) {
+  .pk-card:hover:not(.is-hover-suppressed):not(.is-unflipped-override) .pk-card-front .pk-card-sheen {
+    animation: pkSheenFirstHalf 700ms cubic-bezier(0.25, 0.8, 0.35, 1) forwards;
+  }
+
+  .pk-card:hover:not(.is-hover-suppressed):not(.is-unflipped-override) .pk-card-back .pk-card-sheen {
+    animation: pkSheenSecondHalf 700ms cubic-bezier(0.25, 0.8, 0.35, 1) forwards;
+  }
+}
+
+.pk-card.is-flipped .pk-card-back .pk-card-sheen,
+.pk-card:focus-visible:not(.is-unflipped-override) .pk-card-back .pk-card-sheen {
+  animation: pkSheenSecondHalf 700ms cubic-bezier(0.25, 0.8, 0.35, 1) forwards;
+}
+
+@keyframes pkSheenFirstHalf {
+  0% {
+    opacity: 0;
+    transform: translateX(-130%);
+  }
+
+  20% {
+    opacity: 0.85;
+  }
+
+  52% {
+    opacity: 0;
+    transform: translateX(130%);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(130%);
+  }
+}
+
+@keyframes pkSheenSecondHalf {
+  0% {
+    opacity: 0;
+    transform: translateX(-130%);
+  }
+
+  42% {
+    opacity: 0;
+    transform: translateX(-130%);
+  }
+
+  66% {
+    opacity: 0.85;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(130%);
+  }
+}
+
+/* ─── Collected Reverse Face: Actual Pokémon Trading Card Showcase ──────────── */
+.pk-card-back-tcg {
+  padding: 5px;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(245, 197, 66, 0.12) 0%, #101424 56%, #080a12 100%);
+  border: 2px solid rgba(235, 188, 66, 0.85);
+  border-radius: var(--radius-md);
+  box-shadow:
+    0 14px 32px rgba(0, 0, 0, 0.6),
+    0 0 22px rgba(245, 197, 66, 0.24),
+    inset 0 1px 0 rgba(254, 243, 199, 0.32);
+  justify-content: center;
+  align-items: center;
+}
+
+.pk-tcg-expand-btn {
   position: absolute;
   top: 8px;
   right: 8px;
   z-index: 10;
+  opacity: 0.88;
 }
 
-.pk-card-back-tcg-wrap {
-  flex: 1;
+.pk-tcg-expand-btn:hover,
+.pk-tcg-expand-btn:focus-visible {
+  opacity: 1;
+}
+
+.pk-tcg-art-stage {
+  position: relative;
   width: 100%;
+  height: 100%;
+  border-radius: 7px;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  padding: 0.15rem 0;
+  background: radial-gradient(circle at 50% 44%, #1a2138 0%, #0d111e 68%, #080b14 100%);
 }
 
-.pk-card-back-tcg-img {
-  max-width: 95%;
-  max-height: 225px;
-  object-fit: contain;
-  border-radius: 6px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
-  transition: transform 0.2s ease;
-}
-
-.pk-card:hover .pk-card-back-tcg-img {
-  transform: scale(1.03);
-}
-
-.pk-card-back-bottom-bar {
+.pk-tcg-artwork {
   width: 100%;
-  text-align: left;
-  padding-top: 0.25rem;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+  border-radius: 6px;
 }
 
-.pk-card-back-title-yellow {
-  font-size: 0.95rem;
-  font-weight: 900;
-  color: #ffcb05;
-  letter-spacing: -0.01em;
+.pk-tcg-artwork.pk-tcg-art-fallback {
+  width: 86%;
+  height: 86%;
+  padding-bottom: 2.6rem;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.65));
+}
+
+/* Sleek Translucent Overlay Footer for Real Card Metadata (No Distortion to Card Art) */
+.pk-tcg-footer {
+  position: absolute;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+  z-index: 6;
+  padding: 0.95rem 0.5rem 0.4rem;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+  background: linear-gradient(to top,
+      rgba(6, 9, 17, 0.92) 0%,
+      rgba(6, 9, 17, 0.72) 56%,
+      rgba(6, 9, 17, 0) 100%);
+  pointer-events: none;
+}
+
+.pk-tcg-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+  width: 100%;
+}
+
+.pk-tcg-name {
+  font-family: 'Oxanium', 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fde68a;
+  letter-spacing: 0.015em;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: 3px;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
-.pk-card-back-subtitle-pill {
+.pk-tcg-dex {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.46rem;
+  color: rgba(248, 250, 252, 0.78);
+  flex-shrink: 0;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+.pk-tcg-meta-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.pk-tcg-pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(0, 0, 0, 0.65);
-  border: 1.5px solid rgba(255, 255, 255, 0.18);
-  border-radius: 5px;
-  padding: 2px 7px;
-  max-width: 100%;
-}
-
-.pk-sub-badge {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.54rem;
-  color: #ffffff;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--font-main);
+  font-size: 0.56rem;
   font-weight: 700;
-}
-
-.pk-sub-set {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.54rem;
-  color: #94a3b8;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  line-height: 1.15;
+  max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 120px;
 }
 
-/* ── Back Face (Image 4: Uncollected - Not yet caught + Add Button) ── */
-.pk-card-back-uncollected {
-  transform: rotateY(180deg);
-  background: #090d16;
-  border: 2px solid #18181b;
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 1.5rem 1rem;
-  position: relative;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+.pk-tcg-pill-type {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #f1f5f9;
 }
 
-.pk-uncoll-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.65rem;
-  width: 100%;
-}
-
-.pk-uncoll-title {
-  font-size: 1.25rem;
-  font-weight: 900;
-  color: #ffcb05;
-  letter-spacing: -0.01em;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
-}
-
-.pk-uncoll-num {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.85rem;
-  color: #64748b;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.75rem;
-}
-
-.pk-uncoll-add-btn {
-  width: 44px;
-  height: 44px;
+.pk-tcg-type-dot {
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: #ffcb05;
-  color: #18181b;
-  border: 2.5px solid #18181b;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
-  box-shadow: 0 4px 14px rgba(255, 203, 5, 0.4);
-  padding: 0;
+  flex-shrink: 0;
 }
 
-.pk-uncoll-add-btn:hover {
-  transform: scale(1.15);
-  background: #fde047;
-  box-shadow: 0 6px 18px rgba(255, 203, 5, 0.65);
+.pk-tcg-pill-rarity {
+  background: rgba(245, 197, 66, 0.16);
+  border: 1px solid rgba(245, 197, 66, 0.48);
+  color: #fde68a;
 }
 
-/* ── Missing Pokémon Card Style (Front Locked Silhouette) ── */
-.pk-card-missing .pk-card-front {
+.pk-tcg-pill-set {
+  background: rgba(15, 23, 42, 0.78);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  color: #cbd5e1;
+}
+
+/* ─── Uncollected Pokémon Front (Preserved Dark Navy Silhouette) ────────────── */
+.pk-card-missing .pk-card-front,
+.pk-card-missing .pk-card-missing-front {
   background: var(--bg-card-missing);
   border: 2px solid #18181b;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  transition: border-color 0.32s ease, box-shadow 0.35s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pk-card-missing:hover:not(.is-hover-suppressed):not(.is-unflipped-override) .pk-card-missing-front {
+    border-color: rgba(255, 212, 0, 0.72);
+    box-shadow:
+      0 12px 26px rgba(0, 0, 0, 0.45),
+      0 0 18px rgba(255, 212, 0, 0.2);
+  }
 }
 
 .pk-card-missing .pk-card-number {
   color: var(--accent-gold);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .pk-card-missing .pk-card-art {
@@ -769,11 +1037,163 @@
   color: #64748b;
 }
 
+/* ─── Uncollected Reverse Face: Minimal Deep Navy Card-Addition Design ("+") ── */
+.pk-card-back-add {
+  background:
+    radial-gradient(circle at 50% 48%, rgba(255, 203, 5, 0.09) 0%, #0d1326 52%, #070a14 100%);
+  border: 2px solid rgba(235, 188, 66, 0.72);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  box-shadow:
+    0 14px 32px rgba(0, 0, 0, 0.58),
+    0 0 20px rgba(255, 203, 5, 0.18),
+    inset 0 1px 0 rgba(254, 243, 199, 0.2);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.pk-card-back-add:hover {
+  border-color: rgba(255, 212, 0, 0.95);
+  box-shadow:
+    0 16px 34px rgba(0, 0, 0, 0.64),
+    0 0 26px rgba(255, 203, 5, 0.28),
+    inset 0 1px 0 rgba(254, 243, 199, 0.28);
+}
+
+.pk-add-back-top {
+  position: absolute;
+  top: 0.7rem;
+  left: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.pk-add-back-dex {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  color: rgba(255, 212, 0, 0.72);
+  letter-spacing: 0.04em;
+}
+
+.pk-add-back-poke {
+  font-family: var(--font-main);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgba(148, 163, 184, 0.82);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pk-add-center-group {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding-top: 0.5rem;
+}
+
+.pk-add-plus-btn {
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 42%, rgba(255, 212, 0, 0.14) 0%, rgba(15, 23, 42, 0.75) 78%);
+  border: 2px solid rgba(255, 212, 0, 0.78);
+  color: #FFD400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  box-shadow:
+    0 0 0 6px rgba(255, 212, 0, 0.07),
+    0 6px 20px rgba(0, 0, 0, 0.5),
+    0 0 22px rgba(255, 212, 0, 0.18);
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), background 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, color 0.22s ease;
+}
+
+.pk-card-back-add:hover .pk-add-plus-btn,
+.pk-add-plus-btn:hover,
+.pk-add-plus-btn:focus-visible {
+  transform: scale(1.08);
+  background: radial-gradient(circle at 50% 42%, rgba(255, 212, 0, 0.28) 0%, rgba(255, 196, 0, 0.12) 78%);
+  border-color: #fde047;
+  color: #fef08a;
+  box-shadow:
+    0 0 0 8px rgba(255, 212, 0, 0.12),
+    0 8px 24px rgba(0, 0, 0, 0.55),
+    0 0 28px rgba(255, 212, 0, 0.36);
+  outline: none;
+}
+
+.pk-add-plus-btn:active {
+  transform: scale(0.97);
+}
+
+.pk-add-heading {
+  font-family: 'Oxanium', 'Inter', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #fde68a;
+  text-transform: uppercase;
+  margin-top: 0.3rem;
+}
+
+.pk-add-subtext {
+  font-family: var(--font-main);
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: #94a3b8;
+  line-height: 1.3;
+}
+
+/* ─── Reduced Motion Support ─────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+
+  .pk-card-stage,
+  .pk-card-inner,
+  .pk-card-aura,
+  .pk-card-front-v1,
+  .pk-card-missing-front,
+  .pk-add-plus-btn {
+    transition-duration: 0.12s !important;
+  }
+
+  .pk-card-sheen {
+    animation: none !important;
+  }
+}
+
 /* Card highlight pulse for jump to page */
 @keyframes pkPulse {
-  0% { box-shadow: 0 0 0 0 rgba(255, 203, 5, 0.8); transform: scale(1); }
-  50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0.6); transform: scale(1.04); }
-  100% { box-shadow: 0 0 0 0 rgba(255, 203, 5, 0); transform: scale(1); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 203, 5, 0.8);
+    transform: scale(1);
+  }
+
+  50% {
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0.6);
+    transform: scale(1.04);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 203, 5, 0);
+    transform: scale(1);
+  }
 }
 
 .pk-card-highlight-pulse .pk-card-inner {
