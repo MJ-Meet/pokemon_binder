@@ -5,7 +5,7 @@
 
 // ── API Configuration ──────────────────────────────────────────────────────────
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
-const PROD_API = 'https://pokemon-binder-pkbf.onrender.com';
+const PROD_API = window.POKEBINDER_API_URL || 'https://pokemon-binder-pkbf.onrender.com';
 const API = isLocal ? 'http://localhost:8000' : PROD_API;
 
 // ── Types & Constants ─────────────────────────────────────────────────────────

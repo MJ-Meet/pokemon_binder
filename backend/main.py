@@ -1,4 +1,5 @@
 import io
+import os
 from fpdf import FPDF
 from PIL import Image as PILImage
 from datetime import datetime, timezone
@@ -16,11 +17,12 @@ from database import engine, get_db
 import models
 import schemas
 
-# ── Startup: create tables (idempotent) ───────────────────────────────────────
+# ── Startup: create tables (idempotent, non-destructive) ──────────────────────
 models.Base.metadata.create_all(bind=engine)
 
-# ── Startup: safe column migration (V2) ───────────────────────────────────────
+# ── Startup: safe column migrations (V2) ──────────────────────────────────────
 _V2_MIGRATIONS = [
+    "ALTER TABLE cards ADD COLUMN IF NOT EXISTS card_type       VARCHAR(20)  NOT NULL DEFAULT 'Colorless'",
     "ALTER TABLE cards ADD COLUMN IF NOT EXISTS favorite        BOOLEAN      NOT NULL DEFAULT FALSE",
     "ALTER TABLE cards ADD COLUMN IF NOT EXISTS rarity          VARCHAR(30)",
     "ALTER TABLE cards ADD COLUMN IF NOT EXISTS notes           TEXT",
@@ -30,40 +32,38 @@ _V2_MIGRATIONS = [
     "ALTER TABLE cards ADD COLUMN IF NOT EXISTS date_updated    TIMESTAMPTZ",
 ]
 
-def _run_v2_migrations():
-    with engine.connect() as conn:
-        for stmt in _V2_MIGRATIONS:
-            try:
+def _run_migrations(statements: List[str]):
+    """Run each idempotent DDL/DML statement in its own transaction so one error never aborts others."""
+    for stmt in statements:
+        try:
+            with engine.begin() as conn:
                 conn.execute(sa_text(stmt))
-            except Exception:
-                pass
-        conn.commit()
+        except Exception:
+            pass
 
-_run_v2_migrations()
+_run_migrations(_V2_MIGRATIONS)
 
 
 # ── Startup: Explicit Set Management migration (V3) ───────────────────────────
 _V3_MIGRATIONS = [
-    "CREATE TABLE IF NOT EXISTS card_sets (id INTEGER PRIMARY KEY, name VARCHAR(120) UNIQUE NOT NULL, total_cards INTEGER NOT NULL)",
-    "INSERT INTO card_sets (name, total_cards) SELECT set_name, MAX(set_total_cards) FROM cards WHERE set_name IS NOT NULL AND set_total_cards IS NOT NULL GROUP BY set_name ON CONFLICT(name) DO NOTHING"
+    "CREATE TABLE IF NOT EXISTS card_sets (id SERIAL PRIMARY KEY, name VARCHAR(120) UNIQUE NOT NULL, total_cards INTEGER NOT NULL)",
+    "INSERT INTO card_sets (name, total_cards) SELECT set_name, MAX(set_total_cards) FROM cards WHERE set_name IS NOT NULL AND set_total_cards IS NOT NULL GROUP BY set_name ON CONFLICT(name) DO NOTHING",
 ]
 
-def _run_v3_migrations():
-    with engine.connect() as conn:
-        for stmt in _V3_MIGRATIONS:
-            try:
-                conn.execute(sa_text(stmt))
-            except Exception:
-                pass
-        conn.commit()
-
-_run_v3_migrations()
+_run_migrations(_V3_MIGRATIONS)
 
 app = FastAPI(title="Pokémon Card Binder API")
 
+_cors_origins_env = os.getenv("CORS_ORIGINS", "*").strip()
+_allowed_origins = (
+    ["*"]
+    if not _cors_origins_env or _cors_origins_env == "*"
+    else [origin.strip() for origin in _cors_origins_env.split(",") if origin.strip()]
+)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_allowed_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -82,6 +82,16 @@ RARITY_RANK = ["Gold", "Special Ilustration Art Rare", "Special Art Rare (SAR)",
 @app.get("/")
 def root():
     return {"message": "Pokémon Binder API is running 🎴", "docs": "/docs"}
+
+
+@app.get("/health")
+def health_check(db: Session = Depends(get_db)):
+    """Verify API and PostgreSQL connectivity (used by Render health checks)."""
+    try:
+        db.execute(sa_text("SELECT 1"))
+        return {"status": "ok", "database": "connected"}
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"Database unavailable: {exc}")
 
 
 # ──────────────────────────────────────────────────────────────────────────────
